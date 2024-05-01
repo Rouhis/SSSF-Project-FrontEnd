@@ -64,3 +64,18 @@
   margin: 5px auto; /* center the div and add some vertical space */
   box-sizing: border-box; /* include padding and border in element's total width and height */
 }
+.popup {
+    background-color: #fff; /* white background */
+    color: #333;
+    border-radius: 10px; /* rounded corners */
+    width: 50%; /* fill almost the entire width of the parent div */
+    padding: 20px; /* some padding to give space around the text */
+    margin: 20px auto; /* center the div and add some vertical space */
+    box-sizing: border-box; /* include padding and border in element's total width and height */
+    position: fixed; /* make the popup fixed */
+    top: 50%; /* center the popup vertically */
+    left: 50%; /* center the popup horizontally */
+    transform: translate(-50%, -50%); /* adjust the position of the popup */
+    border: 5px solid #333; /* dark border */
+    z-index: 1000; /* make the popup appear on top of other elements */
+  }

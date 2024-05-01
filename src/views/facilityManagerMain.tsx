@@ -14,6 +14,8 @@ const FacilityManagerMain: React.FC = () => {
   const [keys, setKeys] = useState<Key[]>([]);
   const {token} = useContext(AuthContext);
   const [user, setUser] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedKey, setSelectedKey] = useState<Key | null>(null);
   useEffect(() => {
     const fetchKeys = async () => {
       try {
@@ -51,11 +53,33 @@ const FacilityManagerMain: React.FC = () => {
         <Link to="/employees">Employees</Link>
         <Link to="/organization">Organization</Link>
       </div>
+      <div>
+          {selectedUser && selectedKey && (
+            <div className="popup">
+              <h2>User Information</h2>
+              <p>Name: {selectedUser.user_name}</p>
+              {/* Add more user information here */}
+
+              <h2>Key Information</h2>
+              <p>Key Name: {selectedKey.key_name}</p>
+              {/* Add more key information here */}
+
+              <button onClick={() => setSelectedUser(null)}>Close</button>
+            </div>
+          )}
+        </div>
       <div className="content">
         <div className="division-1">
           <p>Keys out</p>
           {user.map((user: User, index: number) => (
-            <div key={keys[index].id} className="key-div">
+            <div
+              key={keys[index].id}
+              className="key-div"
+              onClick={() => {
+                setSelectedUser(user);
+                setSelectedKey(keys[index]);
+              }}
+            >
               <p>
                 {keys[index].key_name} {user.user_name}
               </p>
