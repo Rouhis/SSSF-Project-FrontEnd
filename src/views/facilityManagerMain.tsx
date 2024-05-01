@@ -2,16 +2,18 @@ import React, {useEffect, useState, useContext} from 'react';
 import {Link} from 'react-router-dom';
 import '../styles/facilityManagerMain.css';
 import {doGraphQLFetch} from '../graphql/fetch';
-import {keysOut} from '../graphql/queries';
+import {keysOut, userById} from '../graphql/queries';
 import {AuthContext} from '../AuthContext';
 import Cookies from 'js-cookie';
+import {Key} from '../interfaces/Key';
+import {User} from '../interfaces/User';
 
 const apiURL = import.meta.env.VITE_API_URL;
 
 const FacilityManagerMain: React.FC = () => {
-  const [keys, setKeys] = useState([]);
+  const [keys, setKeys] = useState<Key[]>([]);
   const {token} = useContext(AuthContext);
-
+  const [user, setUser] = useState<User[]>([]);
   useEffect(() => {
     const fetchKeys = async () => {
       try {
@@ -20,9 +22,23 @@ const FacilityManagerMain: React.FC = () => {
         });
         console.log(data);
         setKeys(data.keysOut || []);
+
+        // Fetch users for each key
+        const users = await Promise.all(
+          data.keysOut.map((key: Key) =>
+            doGraphQLFetch(apiURL, userById, {
+              userByIdId: key.user,
+            }),
+          ),
+        );
+
+        // Extract the user data from the responses
+        const usersData = users.map((response) => response.userById);
+        setUser(usersData);
       } catch (error) {
         console.error(error);
         setKeys([]);
+        setUser([]);
       }
     };
 
@@ -37,9 +53,12 @@ const FacilityManagerMain: React.FC = () => {
       </div>
       <div className="content">
         <div className="division-1">
-          {keys.map((key: {id: string; key_name: string}) => (
-            <div key={key.id}>
-              <p>{key.key_name}</p>
+          <p>Keys out</p>
+          {user.map((user: User, index: number) => (
+            <div key={keys[index].id} className="key-div">
+              <p>
+                {keys[index].key_name} {user.user_name}
+              </p>
             </div>
           ))}
         </div>

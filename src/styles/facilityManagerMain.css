@@ -45,10 +45,22 @@
   flex: 1 1 40%;
   max-width: 40%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   background-color: #333; /* light dark background */
   padding: 20px;
   box-sizing: border-box;
   min-height: 50vh;
   color: #fff; /* white text */
+}
+
+.key-div {
+  background-color: #fff; /* white background */
+  color: #333;
+  border-radius: 10px; /* rounded corners */
+  width: 90%; /* fill almost the entire width of the parent div */
+  padding: 2px;
+  padding-left: 10px; /* some padding to give space around the text */
+  margin: 5px auto; /* center the div and add some vertical space */
+  box-sizing: border-box; /* include padding and border in element's total width and height */
 }

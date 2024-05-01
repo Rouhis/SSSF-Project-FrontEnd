@@ -43,4 +43,13 @@ const keysOut = `query KeysOut($token: String!) {
   }
 }`;
 
-export {login, register, keysOut};
+const userById = `query UserById($userByIdId: ID!) {
+  userById(id: $userByIdId) {
+    id
+    user_name
+    email
+    organization
+  }
+}`;
+
+export {login, register, keysOut, userById};
