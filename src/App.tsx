@@ -1,5 +1,5 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import LoginView from '../src/views/login'; 
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import LoginView from '../src/views/login';
 import RegisterForm from '../src/views/register';
 import FacilityManagerMain from './views/facilityManagerMain';
 

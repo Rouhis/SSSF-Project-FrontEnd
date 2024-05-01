@@ -23,4 +23,24 @@ const register = `mutation Register($user: UserInputTests!) {
   }
 }`;
 
-export { login, register };
+const keysOut = `query KeysOut($token: String!) {
+  keysOut(token: $token) {
+    id
+    key_name
+    loaned
+    user
+    loanedtime
+    returnedtime
+    loantime
+    branch {
+      id
+      branch_name
+      organization {
+        id
+        organization_name
+      }
+    }
+  }
+}`;
+
+export {login, register, keysOut};
