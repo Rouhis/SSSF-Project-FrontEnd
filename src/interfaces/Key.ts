@@ -6,6 +6,7 @@ interface Key {
   loaned?: boolean;
   loanedtime?: Date | null;
   returnedtime?: Date | null;
+  loantime?: Date | null;
 }
 
 export type {Key};

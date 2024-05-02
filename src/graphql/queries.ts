@@ -52,4 +52,78 @@ const userById = `query UserById($userByIdId: ID!) {
   }
 }`;
 
-export {login, register, keysOut, userById};
+const keysByOrg = `query KeysByOrganization($token: String!) {
+  keysByOrganization(token: $token) {
+    id
+    key_name
+    user
+    loaned
+    loanedtime
+    returnedtime
+    loantime
+    branch {
+      id
+      branch_name
+      organization {
+        id
+        organization_name
+      }
+    }
+  }
+}`;
+
+const addKeys = `mutation Mutation($key: KeyInput) {
+  addKey(key: $key) {
+    message
+    key {
+      id
+      key_name
+      user
+      loaned
+      loanedtime
+      returnedtime
+      loantime
+      branch {
+        id
+        branch_name
+        organization {
+          id
+          organization_name
+        }
+      }
+    }
+  }
+}`;
+
+const branchesByOrganization = `query Query($organization: ID!) {
+  branchesByOrganization(organization: $organization) {
+    id
+    branch_name
+    organization {
+      id
+      organization_name
+    }
+  }
+}`;
+
+const checkToken = `query CheckToken {
+  checkToken {
+    message
+    user {
+      id
+      user_name
+      email
+      organization
+    }
+  }
+}`;
+export {
+  login,
+  register,
+  keysOut,
+  userById,
+  keysByOrg,
+  addKeys,
+  branchesByOrganization,
+  checkToken,
+};

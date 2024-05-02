@@ -2,6 +2,7 @@ import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import LoginView from '../src/views/login';
 import RegisterForm from '../src/views/register';
 import FacilityManagerMain from './views/facilityManagerMain';
+import KeysView from './views/keys';
 
 const App: React.FC = () => {
   return (
@@ -10,6 +11,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<LoginView />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/facilityManagerMain" element={<FacilityManagerMain />} />
+        <Route path="/keys" element={<KeysView />} />
       </Routes>
     </Router>
   );
