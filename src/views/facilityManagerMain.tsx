@@ -108,7 +108,7 @@ const FacilityManagerMain: React.FC = () => {
               }}
             >
               <p>
-                {key.key_name} {user[index].user_name}
+                {key.key_name} {user[index] && user[index].user_name}
               </p>
             </div>
           ))}

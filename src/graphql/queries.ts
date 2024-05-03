@@ -78,11 +78,6 @@ const addKeys = `mutation Mutation($key: KeyInput) {
     key {
       id
       key_name
-      user
-      loaned
-      loanedtime
-      returnedtime
-      loantime
       branch {
         id
         branch_name
@@ -117,6 +112,23 @@ const checkToken = `query CheckToken {
     }
   }
 }`;
+
+const userFromToken = `query Query {
+  userFromToken {
+    id
+    user_name
+    email
+    organization
+  }
+}`;
+
+const organizationByName = `query Query($organizationName: String!) {
+  organizationByName(organization_name: $organizationName) {
+    id
+    organization_name
+  }
+}`;
+
 export {
   login,
   register,
@@ -126,4 +138,6 @@ export {
   addKeys,
   branchesByOrganization,
   checkToken,
+  userFromToken,
+  organizationByName,
 };

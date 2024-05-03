@@ -2,19 +2,15 @@ import React, {useContext, useEffect, useState} from 'react';
 import '../styles/keys.css';
 import {Link} from 'react-router-dom';
 import {doGraphQLFetch} from '../graphql/fetch';
-import {
-  addKeys,
-  branchesByOrganization,
-  checkToken,
-  keysByOrg,
-  userById,
-} from '../graphql/queries';
+import {addKeys, keysByOrg, userById} from '../graphql/queries';
 import Cookies from 'js-cookie';
 import {AuthContext} from '../AuthContext';
 import {User} from '../interfaces/User';
 import {Key} from '../interfaces/Key';
 import {Branch} from '../interfaces/Branch';
-import {getUser} from '../GetUser';
+import {getUser} from '../functions/users';
+import {fetchOrganizationByName} from '../functions/organizations';
+import {fetchBranchesByOrg} from '../functions/branches';
 
 const KeysView: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -26,30 +22,51 @@ const KeysView: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedKey, setSelectedKey] = useState<Key | null>(null);
   const [keyName, setKeyName] = useState('');
-  const [branch, setBranch] = useState('');
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [userData, setUserData] = useState<User | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const addKey = async () => {
-    const response = await doGraphQLFetch(apiURL, addKeys, {
-      key: {
-        key_name: keyName,
-        branch: branch,
+    console.log('selected', selectedBranch);
+    const response = await doGraphQLFetch(
+      apiURL,
+      addKeys,
+      {
+        key: {
+          key_name: keyName,
+          branch: selectedBranch,
+        },
       },
-    });
-    console.log('res', response.data);
+      Cookies.get('token'),
+    );
+    console.log('res', response);
     if (response.data) {
       // Add the new key to the keys array
       setKeys((prevKeys) => [...prevKeys, response.data.addKey]);
     }
     setShowAddKeyPopup(false);
+
+    window.location.reload();
+  };
+
+  const fetchBranches = async (userOrg: string) => {
+    try {
+      console.log('org1', userOrg);
+      const organization = await fetchOrganizationByName(apiURL, userOrg);
+      console.log('org', organization?.id); // Fix: Add null check before accessing the 'id' property
+      const branches = await fetchBranchesByOrg(apiURL, organization?.id ?? ''); // Fix: Use nullish coalescing operator to provide a default value of an empty string
+      console.log('branches', branches);
+      setBranches(branches);
+    } catch (error) {
+      console.error(error);
+      setBranches([]);
+    }
   };
 
   useEffect(() => {
     const fetchUser = async () => {
-      const userData = await getUser();
-      console.log('user2', userData);
-      setUserData(userData);
+      const {userFromToken} = (await getUser()) as {userFromToken: User | null}; // Fix: Add type assertion to ensure correct property access
+      console.log('user2', userFromToken);
+      fetchBranches(userFromToken?.organization ?? ''); // Fix: Add nullish coalescing operator to provide a default value of an empty string
     };
 
     fetchUser();
@@ -63,7 +80,6 @@ const KeysView: React.FC = () => {
         });
         console.log(data);
         setKeys(data.keysByOrganization || []);
-        console.log('org', data.keysByOrganization);
         // Fetch users for each key
         const users = await Promise.all(
           data.keysByOrganization.map((key: Key) =>
@@ -132,11 +148,23 @@ const KeysView: React.FC = () => {
                 onChange={(e) => setKeyName(e.target.value)}
               />
               <p>Branch: </p>
-              <input
-                type="text"
-                value={branch}
-                onChange={(e) => setBranch(e.target.value)}
-              />
+              <select
+                value={selectedBranch}
+                onChange={(e) => {
+                  console.log('onChange event triggered');
+                  setSelectedBranch(e.target.value);
+                  console.log('Selected branch id:', e.target.value);
+                }}
+              >
+                <option value="" disabled selected>
+                  Choose branch
+                </option>
+                {branches.map((branchItem, index) => (
+                  <option key={index} value={branchItem.id}>
+                    {branchItem.branch_name}
+                  </option>
+                ))}
+              </select>
               <button type="submit" onClick={addKey}>
                 Add Key
               </button>

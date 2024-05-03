@@ -1,6 +1,6 @@
-import {doGraphQLFetch} from './graphql/fetch';
-import {checkToken} from './graphql/queries';
-import {User} from './interfaces/User';
+import {doGraphQLFetch} from '../graphql/fetch';
+import {userFromToken} from '../graphql/queries';
+import {User} from '../interfaces/User';
 import Cookies from 'js-cookie';
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -13,7 +13,12 @@ export async function getUser(): Promise<User | null> {
   }
 
   try {
-    const user = (await doGraphQLFetch(apiUrl, checkToken, {}, token)) as User;
+    const user = (await doGraphQLFetch(
+      apiUrl,
+      userFromToken,
+      {},
+      token,
+    )) as User;
     console.log('user', user);
     return user;
   } catch (error) {
