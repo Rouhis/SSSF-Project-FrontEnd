@@ -4,6 +4,7 @@ import RegisterForm from '../src/views/register';
 import FacilityManagerMain from './views/facilityManagerMain';
 import KeysView from './views/keys';
 import OrganizationView from './views/organization';
+import EmployeesView from './views/fmEmployees';
 
 const App: React.FC = () => {
   return (
@@ -14,6 +15,7 @@ const App: React.FC = () => {
         <Route path="/facilityManagerMain" element={<FacilityManagerMain />} />
         <Route path="/keys" element={<KeysView />} />
         <Route path="/organization" element={<OrganizationView />} />
+        <Route path="/employees" element={<EmployeesView />} />
       </Routes>
     </Router>
   );

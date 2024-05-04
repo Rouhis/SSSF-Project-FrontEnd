@@ -135,7 +135,7 @@ const organizationByName = `query Query($organizationName: String!) {
   }
 }`;
 
-const addBranch = `mutation Mutation($branch: BranchInput) {
+const addBranch = `mutation AddBranch($branch: BranchInput) {
   addBranch(branch: $branch) {
     message
     branch {
@@ -149,6 +149,29 @@ const addBranch = `mutation Mutation($branch: BranchInput) {
   }
 }
 `;
+
+const usersByOrganization = `query UsersByOrganization($organization: String) {
+  usersByOrganization(organization: $organization) {
+    id
+    user_name
+    email
+    organization
+  }
+}
+`;
+
+const deleteUser = `mutation Mutation($deleteUserId: ID!) {
+  deleteUser(id: $deleteUserId) {
+    message
+    user {
+      id
+      user_name
+      email
+      organization
+    }
+  }
+}
+  `;
 export {
   login,
   register,
@@ -162,4 +185,6 @@ export {
   organizationByName,
   addBranch,
   deleteKeys,
+  usersByOrganization,
+  deleteUser,
 };

@@ -62,10 +62,10 @@ const KeysView: React.FC = () => {
     console.log('res', response);
     if (response.data) {
       // Add the new key to the keys array
-      setKeys((prevKeys) => [...prevKeys, response.data.addKey]);
+      console.log('key deleted');
     }
+    setShowDeleteConfirmation(false);
     setShowAddKeyPopup(false);
-
     window.location.reload();
   };
 
@@ -132,7 +132,7 @@ const KeysView: React.FC = () => {
       </div>
       <div className="container">
         <div className="division">
-          <p>All keys</p>
+          <h3>All keys</h3>
           <button onClick={() => setShowAddKeyPopup(true)}>Add Key</button>
           {keys.map((key: Key, index: number) => (
             <div
@@ -174,7 +174,7 @@ const KeysView: React.FC = () => {
                 }}
               >
                 <button type="submit" onClick={() => deleteKey()}>
-                  Submit
+                  Yes
                 </button>
               </form>
               <button onClick={() => setShowDeleteConfirmation(false)}>

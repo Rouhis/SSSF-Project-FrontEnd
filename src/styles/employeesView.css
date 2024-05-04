@@ -1,0 +1,46 @@
+/* EmployeesView.css */
+
+.app-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: sticky;
+  width: 100vw;
+  height: 5vh;
+  top: 0;
+  background-color: #333; /* dark background */
+  padding: 10px 0;
+  color: #fff; /* white text */
+}
+.employees-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  background-color: #fff;
+  padding: 20px;
+  gap: 20px;
+}
+
+.division {
+  min-width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #333; /* light dark background */
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: 50vh;
+  color: #fff; /* white text */
+}
+
+.employee-div {
+  background-color: #fff; /* white background */
+  color: #333;
+  border-radius: 10px; /* rounded corners */
+  width: 90%; /* fill almost the entire width of the parent div */
+  padding: 2px;
+  padding-left: 10px; /* some padding to give space around the text */
+  margin: 5px auto; /* center the div and add some vertical space */
+  box-sizing: border-box;
+}

@@ -13,7 +13,6 @@ import Cookies from 'js-cookie';
 import {Organization} from '../interfaces/Organization';
 const OrganizationView: React.FC = () => {
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [user, setUser] = useState<User | null>(null);
   const apiURL = import.meta.env.VITE_API_URL;
   const {token} = useContext(AuthContext);
   const [showPopup, setShowPopup] = useState(false);
@@ -44,7 +43,6 @@ const OrganizationView: React.FC = () => {
   useEffect(() => {
     const fetchUserAndBranches = async () => {
       const {userFromToken} = (await getUser()) as {userFromToken: User | null};
-      setUser(userFromToken);
       console.log('user', userFromToken);
 
       if (userFromToken?.organization) {
