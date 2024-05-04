@@ -7,7 +7,7 @@ import {Key} from '../interfaces/Key';
 import {User} from '../interfaces/User';
 import '../styles/facilityManagerMain.css';
 import {Link} from 'react-router-dom';
-
+import {useNavigate} from 'react-router-dom';
 const apiURL = import.meta.env.VITE_API_URL;
 
 const FacilityManagerMain: React.FC = () => {
@@ -16,7 +16,14 @@ const FacilityManagerMain: React.FC = () => {
   const [user, setUser] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedKey, setSelectedKey] = useState<Key | null>(null);
+  const navigate = useNavigate();
+  const logout = () => {
+    // Clear the token or any other cleanup you need to do on logout
 
+    Cookies.remove('token');
+    // Redirect to login page
+    navigate('/login');
+  };
   useEffect(() => {
     const fetchKeys = async () => {
       try {
@@ -73,6 +80,14 @@ const FacilityManagerMain: React.FC = () => {
         <Link to="/employees">Employees</Link>
         <Link to="/organization">Organization</Link>
       </div>
+      <button
+        onClick={() => {
+          logout();
+        }}
+        style={{position: 'absolute', right: '20px', top: '100px'}}
+      >
+        Logout
+      </button>
       <div>
         {selectedUser && selectedKey && (
           <div className="popup">
