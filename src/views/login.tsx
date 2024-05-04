@@ -32,9 +32,18 @@ const LoginView: React.FC = () => {
       const data = await doGraphQLFetch(apiURL, login, {
         credentials: {username, password},
       });
-      console.log(data.login.token);
+      console.log(data.login);
       setToken(data.login.token);
       Cookies.set('token', data.login.token);
+      if (data.login.user.role === 'manager') {
+        navigate('/facilitymanagermain');
+      }
+      if (data.login.user.role === 'admin') {
+        navigate('/adminview');
+      }
+      if (data.login.user.role === 'user') {
+        navigate('/employeeview');
+      }
     } catch (error) {
       console.error(error);
     }

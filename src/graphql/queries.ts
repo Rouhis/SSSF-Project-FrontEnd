@@ -7,6 +7,7 @@ const login = `mutation Login($credentials: Credentials!) {
         user_name
         id
         organization
+        role
       }
     }
   }

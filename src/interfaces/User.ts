@@ -3,6 +3,7 @@ interface User {
   user_name?: string;
   token?: string;
   organization?: string;
+  role?: string;
 }
 
 export type {User};

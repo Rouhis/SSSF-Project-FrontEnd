@@ -28,15 +28,26 @@ const FacilityManagerMain: React.FC = () => {
 
         // Fetch users for each key
         const users = await Promise.all(
-          data.keysOut.map((key: Key) =>
-            doGraphQLFetch(apiURL, userById, {
-              userByIdId: key.user,
-            }),
-          ),
+          data.keysOut.map(async (key: Key) => {
+            try {
+              return await doGraphQLFetch(apiURL, userById, {
+                userByIdId: key.user,
+              });
+            } catch (error) {
+              console.warn(`User not found for key ${key.id}`);
+              return null;
+            }
+          }),
         );
 
         // Extract the user data from the responses
-        const usersData = users.map((response) => response.userById);
+        const usersData = users.map((response) => {
+          if (response?.userById) {
+            return response.userById;
+          } else {
+            return null;
+          }
+        });
         setUser(usersData);
       } catch (error) {
         console.error(error);
