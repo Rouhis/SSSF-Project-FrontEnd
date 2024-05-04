@@ -2,7 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import '../styles/keys.css';
 import {Link} from 'react-router-dom';
 import {doGraphQLFetch} from '../graphql/fetch';
-import {addKeys, keysByOrg, userById} from '../graphql/queries';
+import {addKeys, deleteKeys, keysByOrg, userById} from '../graphql/queries';
 import Cookies from 'js-cookie';
 import {AuthContext} from '../AuthContext';
 import {User} from '../interfaces/User';
@@ -24,6 +24,7 @@ const KeysView: React.FC = () => {
   const [keyName, setKeyName] = useState('');
   const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState('');
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const addKey = async () => {
     console.log('selected', selectedBranch);
@@ -35,6 +36,26 @@ const KeysView: React.FC = () => {
           key_name: keyName,
           branch: selectedBranch,
         },
+      },
+      Cookies.get('token'),
+    );
+    console.log('res', response);
+    if (response.data) {
+      // Add the new key to the keys array
+      setKeys((prevKeys) => [...prevKeys, response.data.addKey]);
+    }
+    setShowAddKeyPopup(false);
+
+    window.location.reload();
+  };
+
+  const deleteKey = async () => {
+    console.log('selected', selectedBranch);
+    const response = await doGraphQLFetch(
+      apiURL,
+      deleteKeys,
+      {
+        deleteKeyId: selectedKey?.id,
       },
       Cookies.get('token'),
     );
@@ -70,6 +91,7 @@ const KeysView: React.FC = () => {
     };
 
     fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -133,7 +155,31 @@ const KeysView: React.FC = () => {
               <p>Name: {selectedKey?.key_name}</p>
               <p>Loaned: {selectedKey?.loaned}</p>
               <p>Holder: {selectedUser?.user_name}</p>
+              <p>Branch: {selectedKey?.branch?.branch_name}</p>
               {/* Add more key information here */}
+              <button onClick={() => setShowDeleteConfirmation(true)}>
+                Delete Key
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showDeleteConfirmation && (
+          <div className="popup2">
+            <div className="popup2-inner">
+              <h2>Are you sure?</h2>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <button type="submit" onClick={() => deleteKey()}>
+                  Submit
+                </button>
+              </form>
+              <button onClick={() => setShowDeleteConfirmation(false)}>
+                No
+              </button>
             </div>
           </div>
         )}

@@ -90,6 +90,12 @@ const addKeys = `mutation Mutation($key: KeyInput) {
   }
 }`;
 
+const deleteKeys = `mutation Mutation($deleteKeyId: ID!) {
+  deleteKey(id: $deleteKeyId) {
+    message
+  }
+}`;
+
 const branchesByOrganization = `query Query($organization: ID!) {
   branchesByOrganization(organization: $organization) {
     id
@@ -129,6 +135,20 @@ const organizationByName = `query Query($organizationName: String!) {
   }
 }`;
 
+const addBranch = `mutation Mutation($branch: BranchInput) {
+  addBranch(branch: $branch) {
+    message
+    branch {
+      id
+      branch_name
+      organization {
+        id
+        organization_name
+      }
+    }
+  }
+}
+`;
 export {
   login,
   register,
@@ -140,4 +160,6 @@ export {
   checkToken,
   userFromToken,
   organizationByName,
+  addBranch,
+  deleteKeys,
 };

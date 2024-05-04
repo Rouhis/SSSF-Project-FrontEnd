@@ -1,7 +1,9 @@
+import {Branch} from './Branch';
+
 interface Key {
   id?: string;
   key_name?: string;
-  branch?: string;
+  branch?: Branch;
   user?: string;
   loaned?: boolean;
   loanedtime?: Date | null;
