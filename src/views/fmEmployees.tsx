@@ -5,7 +5,7 @@ import {getUser} from '../functions/users';
 import {User} from '../interfaces/User';
 import {fetchOrganizationByName} from '../functions/organizations';
 import {doGraphQLFetch} from '../graphql/fetch';
-import {deleteUser, usersByOrganization} from '../graphql/queries';
+import {addEmployee, deleteUser, usersByOrganization} from '../graphql/queries';
 import {Organization} from '../interfaces/Organization';
 import Cookies from 'js-cookie';
 const EmployeesView: React.FC = () => {
@@ -15,6 +15,12 @@ const EmployeesView: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserName, setNewUserName] = useState('');
+  const [showAddPopup, setShowAddPopup] = useState(false);
+  const [userOrg, setUserOrg] = useState<Organization | null>(null);
+  const [showAddedPopup, setShowAddedPopup] = useState(false);
+  const [addedUserPassword, setAddedUserPassword] = useState('');
   // Fetch employees and other necessary data here...
   const fetchedEmployess = async () => {
     const {userFromToken} = (await getUser()) as {userFromToken: User | null};
@@ -25,11 +31,35 @@ const EmployeesView: React.FC = () => {
         userFromToken.organization || '',
       );
     }
+    setUserOrg(usersOrg);
     const data = await doGraphQLFetch(apiURL, usersByOrganization, {
       organization: usersOrg?.organization_name || '',
     });
     console.log('data', data);
     setEmployees(data.usersByOrganization || []);
+  };
+  const addnewEmployee = async () => {
+    console.log('selected', newUserName, newUserEmail, userOrg?.id || '');
+    const response = await doGraphQLFetch(
+      apiURL,
+      addEmployee,
+      {
+        user: {
+          email: newUserEmail,
+          user_name: newUserName,
+          organization: userOrg?.organization_name || '',
+        },
+      },
+      Cookies.get('token'),
+    );
+    console.log('res', response.registerEmployee.password);
+    if (response) {
+      // Add the new key to the keys array
+      setAddedUserPassword(response.registerEmployee.password);
+      console.log('added');
+      setShowAddPopup(false);
+      setShowAddedPopup(true);
+    }
   };
   const deleteEmployee = async () => {
     console.log('selected', selectedEmployee?.id);
@@ -63,6 +93,7 @@ const EmployeesView: React.FC = () => {
       <div className="container">
         <div className="division">
           <h3>Employees</h3>
+          <button onClick={() => setShowAddPopup(true)}>Add Employee</button>
           {employees.map((employee) => (
             <div
               key={employee.id}
@@ -103,6 +134,67 @@ const EmployeesView: React.FC = () => {
                 <button onClick={() => setShowDeleteConfirmation(false)}>
                   No
                 </button>
+              </div>
+            </div>
+          )}
+          {showAddPopup && (
+            <div className="popup" onClick={() => setShowAddPopup(false)}>
+              <div
+                className="popup-inner"
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <h2>Add Employee</h2>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                  }}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px',
+                  }}
+                >
+                  <label>
+                    Name:
+                    <input
+                      type="text"
+                      value={newUserName}
+                      onChange={(e) => setNewUserName(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Email:
+                    <input
+                      type="email"
+                      value={newUserEmail}
+                      onChange={(e) => setNewUserEmail(e.target.value)}
+                    />
+                  </label>
+                  <button type="submit" onClick={() => addnewEmployee()}>
+                    Add
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
+          {showAddedPopup && (
+            <div className="popup2" onClick={() => setShowAddedPopup(false)}>
+              <div
+                className="popup-inner2"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h2>User Added</h2>
+                <label>
+                  Password:
+                  <input type="text" readOnly value={addedUserPassword} />
+                </label>
+                <button onClick={() => setShowAddedPopup(false)}>Close</button>
               </div>
             </div>
           )}

@@ -172,6 +172,20 @@ const deleteUser = `mutation Mutation($deleteUserId: ID!) {
   }
 }
   `;
+
+const addEmployee = `mutation Mutation($user: UserInput!) {
+  registerEmployee(user: $user) {
+    message
+    user {
+      id
+      user_name
+      email
+      organization
+    }
+    password
+  }
+}`;
+
 export {
   login,
   register,
@@ -187,4 +201,5 @@ export {
   deleteKeys,
   usersByOrganization,
   deleteUser,
+  addEmployee,
 };
