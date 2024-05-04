@@ -100,7 +100,7 @@ const KeysView: React.FC = () => {
       }
     };
     fetchKeys();
-  }, [token]);
+  }, [apiURL, token]);
   return (
     <div className="main-container">
       <div className="app-bar">
