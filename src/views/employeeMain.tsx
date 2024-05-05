@@ -11,6 +11,7 @@ import Cookies from 'js-cookie';
 import {Key} from '../interfaces/Key';
 import '../styles/facilityManagerMain.css';
 import {useNavigate} from 'react-router-dom';
+import Pusher from 'pusher-js';
 
 const apiURL = import.meta.env.VITE_API_URL;
 
@@ -27,6 +28,24 @@ const EmployeeMain: React.FC = () => {
   const [returnKey, setReturnKey] = useState<Key | null>(null);
   const navigate = useNavigate();
   const token = Cookies.get('token');
+  const [isKeyLate, setIsKeyLate] = useState(false);
+  const [lateKeys, setLateKeys] = useState<Key[]>([]);
+  const [userID, setUserID] = useState('');
+  const [ws, setWs] = useState<WebSocket | null>(null);
+
+  const beamsClient = new PushNotifications({
+    instanceId: 'YOUR_PUSHER_BEAMS_INSTANCE_ID', // Replace with your actual ID
+  });
+  const sendKeyLateMessage = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      console.log('sending message');
+      ws.send(
+        JSON.stringify({
+          isKeyLate: true,
+        }),
+      );
+    }
+  };
 
   const handleSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,6 +104,25 @@ const EmployeeMain: React.FC = () => {
     window.location.reload();
   };
   useEffect(() => {
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
+
+    const pusher = new Pusher('261d927c11ac3a98f0c4', {
+      cluster: 'eu',
+    });
+
+    const channel = pusher.subscribe('my-channel');
+    channel.bind('my-event', function (data: unknown) {
+      alert(JSON.stringify(data));
+    });
+
+    // Clean up function
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, []);
+  useEffect(() => {
     const fetchKeys = async () => {
       const data = await doGraphQLFetch(apiURL, keysByOrg, {
         token: token,
@@ -99,16 +137,29 @@ const EmployeeMain: React.FC = () => {
         {},
         token,
       );
+      setUserID(userResponse.userFromToken.id);
+      setWs(new WebSocket(`ws://localhost:8080?userID=${userID}`));
       console.log('user', userResponse);
       // Filter keys to only include keys where key.user equals user.id
       const userKeys = allKeys.filter(
         (key: Key) => key.user === userResponse.userFromToken.id,
       );
+
       setKeys(allKeys.filter((key: Key) => key.loaned == false));
       setUserKeys(userKeys);
+      const lateKeys = userKeys.filter(
+        (key: Key) => new Date(key.loanedtime as Date) < new Date(),
+      );
+      console.log('lateKeys', lateKeys);
+      setLateKeys(lateKeys);
+      if (lateKeys.length > 0) {
+        console.log('late');
+        setIsKeyLate(true);
+        sendKeyLateMessage();
+      }
     };
     fetchKeys();
-  }, [apiURL, token]);
+  }, [token]);
 
   return (
     <div className="main-container">

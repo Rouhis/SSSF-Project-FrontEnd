@@ -70,7 +70,7 @@ const AdminView: React.FC = () => {
         user: {
           email: newUserEmail,
           user_name: newUserName,
-          organization: currentOrg?.id || '',
+          organization: currentOrg?.organization_name || '',
         },
       },
       token,

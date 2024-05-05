@@ -24,6 +24,7 @@ const FacilityManagerMain: React.FC = () => {
     // Redirect to login page
     navigate('/login');
   };
+
   useEffect(() => {
     const fetchKeys = async () => {
       try {

@@ -260,6 +260,14 @@ const addOrganization = `mutation AddOrganization($organization: OrganizationInp
   }
 }
 `;
+
+const orgById = `query Query($organizationByIdId: ID!) {
+  organizationById(id: $organizationByIdId) {
+    id
+    organization_name
+  }
+}
+`;
 export {
   login,
   register,
@@ -282,4 +290,5 @@ export {
   getAllOrgs,
   addFM,
   addOrganization,
+  orgById,
 };
