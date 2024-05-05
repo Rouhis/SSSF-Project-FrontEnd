@@ -11,6 +11,7 @@ import {doGraphQLFetch} from '../graphql/fetch';
 import {addBranch} from '../graphql/queries';
 import Cookies from 'js-cookie';
 import {Organization} from '../interfaces/Organization';
+
 const OrganizationView: React.FC = () => {
   const [branches, setBranches] = useState<Branch[]>([]);
   const apiURL = import.meta.env.VITE_API_URL;

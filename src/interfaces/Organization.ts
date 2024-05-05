@@ -1,6 +1,6 @@
-interface organization {
+interface Organization {
   id?: string;
   organization_name?: string;
 }
 
-export type {organization};
+export type {Organization};
