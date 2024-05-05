@@ -268,6 +268,7 @@ const orgById = `query Query($organizationByIdId: ID!) {
   }
 }
 `;
+
 export {
   login,
   register,

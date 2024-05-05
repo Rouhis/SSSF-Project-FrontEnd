@@ -6,13 +6,10 @@ import {
   updateUser,
   userFromToken,
 } from '../graphql/queries';
-
 import Cookies from 'js-cookie';
 import {Key} from '../interfaces/Key';
 import '../styles/facilityManagerMain.css';
 import {useNavigate} from 'react-router-dom';
-import Pusher from 'pusher-js';
-
 const apiURL = import.meta.env.VITE_API_URL;
 
 const EmployeeMain: React.FC = () => {
@@ -33,9 +30,6 @@ const EmployeeMain: React.FC = () => {
   const [userID, setUserID] = useState('');
   const [ws, setWs] = useState<WebSocket | null>(null);
 
-  const beamsClient = new PushNotifications({
-    instanceId: 'YOUR_PUSHER_BEAMS_INSTANCE_ID', // Replace with your actual ID
-  });
   const sendKeyLateMessage = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       console.log('sending message');
@@ -103,25 +97,7 @@ const EmployeeMain: React.FC = () => {
     setShowPopup(false);
     window.location.reload();
   };
-  useEffect(() => {
-    // Enable pusher logging - don't include this in production
-    Pusher.logToConsole = true;
 
-    const pusher = new Pusher('261d927c11ac3a98f0c4', {
-      cluster: 'eu',
-    });
-
-    const channel = pusher.subscribe('my-channel');
-    channel.bind('my-event', function (data: unknown) {
-      alert(JSON.stringify(data));
-    });
-
-    // Clean up function
-    return () => {
-      channel.unbind_all();
-      channel.unsubscribe();
-    };
-  }, []);
   useEffect(() => {
     const fetchKeys = async () => {
       const data = await doGraphQLFetch(apiURL, keysByOrg, {
