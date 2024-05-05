@@ -8,7 +8,7 @@ import {User} from '../interfaces/User';
 import {fetchOrganizationByName} from '../functions/organizations';
 import '../styles/organization.css';
 import {doGraphQLFetch} from '../graphql/fetch';
-import {addBranch} from '../graphql/queries';
+import {addBranch, deleteBranch} from '../graphql/queries';
 import Cookies from 'js-cookie';
 import {Organization} from '../interfaces/Organization';
 
@@ -21,6 +21,7 @@ const OrganizationView: React.FC = () => {
   const [showAddBranchPopup, setShowAddBranchPopup] = useState(false);
   const [newBranchName, setNewBranchName] = useState('');
   const [userOrg, setUserOrg] = useState<Organization | null>(null);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const addBranches = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -40,7 +41,23 @@ const OrganizationView: React.FC = () => {
     setShowAddBranchPopup(false);
     window.location.reload();
   };
-
+  const deleteBranches = async () => {
+    console.log('selected', selectedBranch);
+    const response = await doGraphQLFetch(
+      apiURL,
+      deleteBranch,
+      {
+        deleteBranchId: selectedBranch?.id,
+      },
+      Cookies.get('token'),
+    );
+    console.log('res', response);
+    if (response) {
+      console.log('deleted');
+    }
+    setShowAddBranchPopup(false);
+    window.location.reload();
+  };
   useEffect(() => {
     const fetchUserAndBranches = async () => {
       const {userFromToken} = (await getUser()) as {userFromToken: User | null};
@@ -130,8 +147,19 @@ const OrganizationView: React.FC = () => {
                 <h2>Branch Information</h2>
                 <p>Name: {selectedBranch?.branch_name}</p>
                 <p>ID: {selectedBranch?.id}</p>
+                <button onClick={() => setShowConfirmPopup(true)}>
+                  Delete Branch
+                </button>
                 {/* Add more branch information here */}
               </div>
+            </div>
+          )}
+
+          {showConfirmPopup && (
+            <div className="popup">
+              <p>Are you sure you want to delete this branch?</p>
+              <button onClick={() => deleteBranches()}>Yes</button>
+              <button onClick={() => setShowConfirmPopup(false)}>No</button>
             </div>
           )}
         </div>

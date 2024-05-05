@@ -187,6 +187,11 @@ const addEmployee = `mutation Mutation($user: UserInput!) {
   }
 }`;
 
+const deleteBranch = `mutation Mutation($deleteBranchId: ID!) {
+  deleteBranch(id: $deleteBranchId) {
+    message
+  }
+}`;
 export {
   login,
   register,
@@ -203,4 +208,5 @@ export {
   usersByOrganization,
   deleteUser,
   addEmployee,
+  deleteBranch,
 };
