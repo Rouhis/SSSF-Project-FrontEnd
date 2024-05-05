@@ -29,6 +29,7 @@ const EmployeeMain: React.FC = () => {
   const [lateKeys, setLateKeys] = useState<Key[]>([]);
   const [userID, setUserID] = useState('');
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [showNotification, setShowNotification] = useState(false);
 
   const sendKeyLateMessage = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -40,6 +41,35 @@ const EmployeeMain: React.FC = () => {
       );
     }
   };
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isKeyLate) {
+      setShowNotification(true);
+      timer = setTimeout(() => {
+        setShowNotification(false);
+      }, 5000);
+    }
+    return () => clearTimeout(timer);
+  }, [isKeyLate]);
+
+  useEffect(() => {
+    if (ws) {
+      console.log('WebSocket ready state:', ws.readyState);
+      ws.onmessage = (event) => {
+        if (event.data) {
+          console.log('Received message from server:', event.data);
+          // Parse the JSON data and handle the message content
+          const message = JSON.parse(event.data);
+          // Handle the message based on its type (e.g., display notification, update UI)
+          console.log('message', message);
+          if (message.message === 'Key is late') {
+            setIsKeyLate(true);
+          }
+        }
+      };
+    }
+  }, [ws]); // Depend on ws state
 
   const handleSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,7 +160,6 @@ const EmployeeMain: React.FC = () => {
       setLateKeys(lateKeys);
       if (lateKeys.length > 0) {
         console.log('late');
-        setIsKeyLate(true);
         sendKeyLateMessage();
       }
     };
@@ -155,6 +184,29 @@ const EmployeeMain: React.FC = () => {
         Logout
       </button>
       {/* ... other JSX ... */}
+      {showNotification && (
+        <div
+          className="notification"
+          style={{
+            position: 'fixed',
+            top: '100px',
+            left: '50px', // Changed from right to left
+            zIndex: 1000,
+            backgroundColor: '#333',
+            color: '#ffcccc', // Light red text (complementary)
+            padding: '10px',
+            borderRadius: '5px',
+            boxShadow: '0px 8px 16px 0px rgba(0,0,0,0.2)',
+            fontFamily: 'Arial, sans-serif',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            display: 'flex', // Added for icon placement
+            alignItems: 'center', // Added for icon placement
+          }}
+        >
+          Key is late
+        </div>
+      )}
       {showSettingsPopup && (
         <div className="popup">
           <form onSubmit={handleSettingsSubmit}>

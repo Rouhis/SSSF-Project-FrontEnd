@@ -72,3 +72,14 @@
   border: 5px solid #333; /* dark border */
   z-index: 1000; /* make the popup appear on top of other elements */
 }
+
+.notification {
+  position: 'fixed';
+  top: '10px';
+  left: '10px';
+  z-index: 1000;
+  background-color: 'red';
+  color: 'white';
+  padding: '10px';
+  border-radius: '5px';
+}
