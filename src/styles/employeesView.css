@@ -30,8 +30,9 @@
   background-color: #333; /* light dark background */
   padding: 20px;
   box-sizing: border-box;
-  min-height: 50vh;
+  height: 50vh;
   color: #fff; /* white text */
+  overflow-y: auto; /* make it scrollable */
 }
 
 .employee-div {

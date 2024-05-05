@@ -10,6 +10,7 @@ import {checkToken} from './graphql/queries';
 import {useEffect, useState} from 'react';
 import Cookies from 'js-cookie';
 import EmployeeMain from './views/employeeMain';
+import AdminView from './views/admin';
 
 const App: React.FC = () => {
   const apiURL = import.meta.env.VITE_API_URL;
@@ -72,6 +73,10 @@ const App: React.FC = () => {
               <p>Access Denied</p>
             )
           }
+        />
+        <Route
+          path="/adminview"
+          element={hasRole('admin') ? <AdminView /> : <p>Access Denied</p>}
         />
       </Routes>
     </Router>

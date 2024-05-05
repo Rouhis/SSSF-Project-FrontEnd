@@ -228,6 +228,38 @@ const updateUser = `mutation Mutation($user: UserModify!) {
     }
   }
 }`;
+
+const getAllOrgs = `query Organizations {
+  organizations {
+    id
+    organization_name
+  }
+}
+`;
+
+const addFM = `mutation Mutation($user: UserInput!) {
+  registerFaciltyManager(user: $user) {
+    message
+    user {
+      id
+      user_name
+      email
+      organization
+    }
+    password
+  }
+}`;
+
+const addOrganization = `mutation AddOrganization($organization: OrganizationInput) {
+  addOrganization(organization: $organization) {
+    message
+    organization {
+      id
+      organization_name
+    }
+  }
+}
+`;
 export {
   login,
   register,
@@ -247,4 +279,7 @@ export {
   checkToken,
   loanKey,
   updateUser,
+  getAllOrgs,
+  addFM,
+  addOrganization,
 };
