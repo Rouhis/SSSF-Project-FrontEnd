@@ -108,18 +108,6 @@ const branchesByOrganization = `query Query($organization: ID!) {
   }
 }`;
 
-const checkToken = `query CheckToken {
-  checkToken {
-    message
-    user {
-      id
-      user_name
-      email
-      organization
-    }
-  }
-}`;
-
 const userFromToken = `query Query {
   userFromToken {
     id
@@ -192,6 +180,41 @@ const deleteBranch = `mutation Mutation($deleteBranchId: ID!) {
     message
   }
 }`;
+
+const checkToken = `query Query {
+  checkToken {
+    message
+    user {
+      user_name
+      email
+      organization
+      role
+    }
+  }
+}`;
+
+const loanKey = `mutation Mutation($loanKeyId: ID!, $key: LoanKey) {
+  loanKey(id: $loanKeyId, key: $key) {
+    message
+    key {
+      id
+      key_name
+      user
+      loaned
+      loanedtime
+      returnedtime
+      loantime
+      branch {
+        id
+        branch_name
+        organization {
+          id
+          organization_name
+        }
+      }
+    }
+  }
+}`;
 export {
   login,
   register,
@@ -200,7 +223,6 @@ export {
   keysByOrg,
   addKeys,
   branchesByOrganization,
-  checkToken,
   userFromToken,
   organizationByName,
   addBranch,
@@ -209,4 +231,6 @@ export {
   deleteUser,
   addEmployee,
   deleteBranch,
+  checkToken,
+  loanKey,
 };

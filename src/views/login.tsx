@@ -42,7 +42,7 @@ const LoginView: React.FC = () => {
         navigate('/adminview');
       }
       if (data.login.user.role === 'user') {
-        navigate('/employeeview');
+        navigate('/employeeMain');
       }
     } catch (error) {
       console.error(error);
