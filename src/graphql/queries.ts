@@ -215,6 +215,19 @@ const loanKey = `mutation Mutation($loanKeyId: ID!, $key: LoanKey) {
     }
   }
 }`;
+
+const updateUser = `mutation Mutation($user: UserModify!) {
+  updateUser(user: $user) {
+    message
+    user {
+      id
+      user_name
+      email
+      role
+      organization
+    }
+  }
+}`;
 export {
   login,
   register,
@@ -233,4 +246,5 @@ export {
   deleteBranch,
   checkToken,
   loanKey,
+  updateUser,
 };

@@ -1,29 +1,26 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useEffect, useState} from 'react';
 import {doGraphQLFetch} from '../graphql/fetch';
 import {
-  checkToken,
   keysByOrg,
-  keysOut,
   loanKey,
-  userById,
+  updateUser,
   userFromToken,
 } from '../graphql/queries';
-import {AuthContext} from '../AuthContext';
+
 import Cookies from 'js-cookie';
 import {Key} from '../interfaces/Key';
-import {User} from '../interfaces/User';
 import '../styles/facilityManagerMain.css';
-import {Link} from 'react-router-dom';
 import {useNavigate} from 'react-router-dom';
 
 const apiURL = import.meta.env.VITE_API_URL;
 
 const EmployeeMain: React.FC = () => {
   const [keys, setKeys] = useState<Key[]>([]);
-  const [user, setUser] = useState<User>();
   const [showPopup, setShowPopup] = useState(false);
   const [selectedKey, setSelectedKey] = useState<Key | null>(null);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showSettingsPopup, setShowSettingsPopup] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [userKeys, setUserKeys] = useState<Key[]>([]);
   const [returnTime, setReturnTime] = useState('');
   const [showReturnPopup, setShowReturnPopup] = useState(false);
@@ -31,6 +28,23 @@ const EmployeeMain: React.FC = () => {
   const navigate = useNavigate();
   const token = Cookies.get('token');
 
+  const handleSettingsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Code to change the username and password goes here
+    const response = doGraphQLFetch(
+      apiURL,
+      updateUser,
+      {
+        user: {
+          user_name: newUsername,
+          password: newPassword,
+        },
+      },
+      token,
+    );
+    console.log('res', response);
+    setShowSettingsPopup(false);
+  };
   const logout = () => {
     // Clear the token or any other cleanup you need to do on logout
     Cookies.remove('token');
@@ -86,8 +100,6 @@ const EmployeeMain: React.FC = () => {
         token,
       );
       console.log('user', userResponse);
-      setUser(userResponse.userFromToken);
-
       // Filter keys to only include keys where key.user equals user.id
       const userKeys = allKeys.filter(
         (key: Key) => key.user === userResponse.userFromToken.id,
@@ -101,7 +113,13 @@ const EmployeeMain: React.FC = () => {
   return (
     <div className="main-container">
       <div className="app-bar">
-        <Link to="/settings">Settings</Link>
+        <button
+          onClick={() => {
+            setShowSettingsPopup(true);
+          }}
+        >
+          Settings
+        </button>
       </div>
       <button
         onClick={logout}
@@ -109,6 +127,32 @@ const EmployeeMain: React.FC = () => {
       >
         Logout
       </button>
+      {/* ... other JSX ... */}
+      {showSettingsPopup && (
+        <div className="popup">
+          <form onSubmit={handleSettingsSubmit}>
+            <label>
+              New name:
+              <input
+                type="text"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+              />
+            </label>
+            <label>
+              New Password:
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </label>
+            <button type="submit">Change</button>
+          </form>
+          <button onClick={() => setShowSettingsPopup(false)}>Close</button>
+        </div>
+      )}
+      {/* ... other JSX ... */}
       <div className="content">
         <div className="division-1">
           <p>Loaned keys</p>
