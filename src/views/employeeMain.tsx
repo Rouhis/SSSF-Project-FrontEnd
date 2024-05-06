@@ -30,7 +30,7 @@ const EmployeeMain: React.FC = () => {
   const [userID, setUserID] = useState('');
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [showNotification, setShowNotification] = useState(false);
-
+  const WebSocketUrl = import.meta.env.VITE_WS_URL;
   const sendKeyLateMessage = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
       console.log('sending message late key', lateKeys[0].id);
@@ -144,7 +144,7 @@ const EmployeeMain: React.FC = () => {
         token,
       );
       setUserID(userResponse.userFromToken.id);
-      setWs(new WebSocket(`ws://localhost:8080?userID=${userID}`));
+      setWs(new WebSocket(`${WebSocketUrl}?userID=${userID}`));
       console.log('user', userResponse);
       // Filter keys to only include keys where key.user equals user.id
       const userKeys = allKeys.filter(

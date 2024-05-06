@@ -27,7 +27,6 @@ const LoginView: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(apiURL);
     try {
       const data = await doGraphQLFetch(apiURL, login, {
         credentials: {username, password},
