@@ -33,7 +33,7 @@ const EmployeeMain: React.FC = () => {
 
   const sendKeyLateMessage = () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      console.log('sending message');
+      console.log('sending message late key', lateKeys[0].id);
       ws.send(
         JSON.stringify({
           isKeyLate: true,
