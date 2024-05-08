@@ -14,14 +14,14 @@ import AdminView from './views/admin';
 
 const App: React.FC = () => {
   const apiURL = import.meta.env.VITE_API_URL;
-  const [userRoles, setUserRoles] = useState<string[]>([]); // Array to store user roles
+  const [userRoles, setUserRoles] = useState<string[]>([]);
 
   const fetchUserToken = async () => {
     const token = Cookies.get('token');
     if (token) {
       const data = await doGraphQLFetch(apiURL, checkToken, {}, token);
       console.log(data.checkToken.user.role);
-      setUserRoles(data.checkToken.user.role.split(',')); // Assuming roles are comma-separated (adjust if needed)
+      setUserRoles(data.checkToken.user.role.split(','));
     }
   };
 
@@ -29,11 +29,11 @@ const App: React.FC = () => {
     fetchUserToken();
   }, []);
 
-  // Helper function to check if user has a specific role
   const hasRole = (requiredRole: string): boolean => {
     return userRoles.includes(requiredRole);
   };
 
+  // If loading state is true, display loading message
   return (
     <Router>
       <Routes>

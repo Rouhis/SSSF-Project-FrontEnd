@@ -30,16 +30,18 @@ const EmployeeMain: React.FC = () => {
   const [userID, setUserID] = useState('');
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [showNotification, setShowNotification] = useState(false);
-  const WebSocketUrl = import.meta.env.VITE_WS_URL;
+  const WebSocketUrl = import.meta.env.VITE_WS_URL2;
   const sendKeyLateMessage = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      console.log('sending message late key', lateKeys[0].id);
-      ws.send(
-        JSON.stringify({
-          isKeyLate: true,
-        }),
-      );
+    if (!ws) {
+      console.log('WebSocket not ready');
+      return;
     }
+    console.log('sending message late key', lateKeys[0].id);
+    ws.send(
+      JSON.stringify({
+        isKeyLate: true,
+      }),
+    );
   };
 
   useEffect(() => {
@@ -69,7 +71,7 @@ const EmployeeMain: React.FC = () => {
         }
       };
     }
-  }, [ws]); // Depend on ws state
+  }, [ws, isKeyLate]); // Depend on ws state
 
   const handleSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();

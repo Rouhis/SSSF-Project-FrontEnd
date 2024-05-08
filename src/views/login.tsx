@@ -47,6 +47,7 @@ const LoginView: React.FC = () => {
       console.error(error);
     }
   };
+
   const navigateRegister = () => {
     navigate('/register');
   };
