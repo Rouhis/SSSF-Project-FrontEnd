@@ -25,8 +25,7 @@ const EmployeeMain: React.FC = () => {
   const [returnKey, setReturnKey] = useState<Key | null>(null);
   const [lateKeys, setLateKeys] = useState<Key[]>([]);
   const navigate = useNavigate();
-  const token = Cookies.get('token');
-
+  const token = Cookies.get('token') || '';
   const handleSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Code to change the username and password goes here

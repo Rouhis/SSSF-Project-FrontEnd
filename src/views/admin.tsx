@@ -1,7 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import '../styles/employeesView.css';
+import '../styles/facilityManagerMain.css';
 import {doGraphQLFetch} from '../graphql/fetch';
-import {addFM, addOrganization, getAllOrgs} from '../graphql/queries';
+import {
+  addFM,
+  addOrganization,
+  getAllOrgs,
+  updateUser,
+} from '../graphql/queries';
 import {Organization} from '../interfaces/Organization';
 import Cookies from 'js-cookie';
 import {useNavigate} from 'react-router-dom';
@@ -21,9 +26,29 @@ const AdminView: React.FC = () => {
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
   const [newUserPassword, setNewUserPassword] = useState('');
   const [newOrgName, setNewOrgName] = useState('');
+  const [showSettingsPopup, setShowSettingsPopup] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const token = Cookies.get('token');
   const navigate = useNavigate();
 
+  const handleSettingsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Code to change the username and password goes here
+    const response = doGraphQLFetch(
+      apiURL,
+      updateUser,
+      {
+        user: {
+          user_name: newUsername,
+          password: newPassword,
+        },
+      },
+      token || '',
+    );
+    console.log('res', response);
+    setShowSettingsPopup(false);
+  };
   const logout = () => {
     // Clear the token or any other cleanup you need to do on logout
     Cookies.remove('token');
@@ -93,7 +118,38 @@ const AdminView: React.FC = () => {
   }, [apiURL]);
   return (
     <div className="main-container">
-      <div className="app-bar"></div>
+      <div className="app-bar">
+        <button
+          className="settings-button"
+          onClick={() => setShowSettingsPopup(true)}
+        >
+          Settings
+        </button>
+        {showSettingsPopup && (
+          <div className="popup">
+            <form onSubmit={handleSettingsSubmit}>
+              <label>
+                New name:
+                <input
+                  type="text"
+                  value={newUsername}
+                  onChange={(e) => setNewUsername(e.target.value)}
+                />
+              </label>
+              <label>
+                New Password:
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </label>
+              <button type="submit">Change</button>
+            </form>
+            <button onClick={() => setShowSettingsPopup(false)}>Close</button>
+          </div>
+        )}
+      </div>
       <button
         onClick={logout}
         style={{position: 'absolute', right: '20px', top: '100px'}}

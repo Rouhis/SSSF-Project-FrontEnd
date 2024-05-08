@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {doGraphQLFetch} from '../graphql/fetch';
-import {keysOut, userById} from '../graphql/queries';
+import {keysOut, updateUser, userById} from '../graphql/queries';
 import {AuthContext} from '../AuthContext';
 import Cookies from 'js-cookie';
 import {Key} from '../interfaces/Key';
@@ -8,6 +8,7 @@ import {User} from '../interfaces/User';
 import '../styles/facilityManagerMain.css';
 import {Link} from 'react-router-dom';
 import {useNavigate} from 'react-router-dom';
+
 const apiURL = import.meta.env.VITE_API_URL;
 
 const FacilityManagerMain: React.FC = () => {
@@ -16,6 +17,9 @@ const FacilityManagerMain: React.FC = () => {
   const [user, setUser] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedKey, setSelectedKey] = useState<Key | null>(null);
+  const [showSettingsPopup, setShowSettingsPopup] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const navigate = useNavigate();
   const logout = () => {
     // Clear the token or any other cleanup you need to do on logout
@@ -24,7 +28,23 @@ const FacilityManagerMain: React.FC = () => {
     // Redirect to login page
     navigate('/login');
   };
-
+  const handleSettingsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Code to change the username and password goes here
+    const response = doGraphQLFetch(
+      apiURL,
+      updateUser,
+      {
+        user: {
+          user_name: newUsername,
+          password: newPassword,
+        },
+      },
+      token || '',
+    );
+    console.log('res', response);
+    setShowSettingsPopup(false);
+  };
   useEffect(() => {
     const fetchKeys = async () => {
       try {
@@ -73,15 +93,18 @@ const FacilityManagerMain: React.FC = () => {
     return loanedTime && now > loanedTime;
   });
   const onTimeKeys = keys.filter((key: Key) => !overdueKeys.includes(key));
-  console.log('keys', keys);
-  console.log('keys', onTimeKeys);
-  console.log('overdue', overdueKeys);
   return (
     <div className="main-container">
       <div className="app-bar">
         <Link to="/keys">Keys</Link>
         <Link to="/employees">Employees</Link>
         <Link to="/organization">Organization</Link>
+        <button
+          className="settings-button"
+          onClick={() => setShowSettingsPopup(true)}
+        >
+          Settings
+        </button>
       </div>
       <button
         onClick={() => {
@@ -91,6 +114,30 @@ const FacilityManagerMain: React.FC = () => {
       >
         Logout
       </button>
+      {showSettingsPopup && (
+        <div className="popup">
+          <form onSubmit={handleSettingsSubmit}>
+            <label>
+              New name:
+              <input
+                type="text"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+              />
+            </label>
+            <label>
+              New Password:
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </label>
+            <button type="submit">Change</button>
+          </form>
+          <button onClick={() => setShowSettingsPopup(false)}>Close</button>
+        </div>
+      )}
       <div>
         {selectedUser && selectedKey && (
           <div className="popup">

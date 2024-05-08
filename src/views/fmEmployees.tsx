@@ -8,10 +8,10 @@ import {doGraphQLFetch} from '../graphql/fetch';
 import {addEmployee, deleteUser, usersByOrganization} from '../graphql/queries';
 import {Organization} from '../interfaces/Organization';
 import Cookies from 'js-cookie';
+
 const EmployeesView: React.FC = () => {
   const apiURL = import.meta.env.VITE_API_URL;
   const [employees, setEmployees] = useState<User[]>([]);
-
   const [showPopup, setShowPopup] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<User | null>(null);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
