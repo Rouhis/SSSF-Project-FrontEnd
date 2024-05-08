@@ -71,7 +71,7 @@ const EmployeeMain: React.FC = () => {
         }
       };
     }
-  }, [ws, isKeyLate]); // Depend on ws state
+  }, [ws, isKeyLate]); // Depend on ws state works clumsy
 
   const handleSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
