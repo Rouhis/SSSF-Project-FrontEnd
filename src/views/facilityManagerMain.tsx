@@ -69,11 +69,13 @@ const FacilityManagerMain: React.FC = () => {
 
   const now = new Date();
   const overdueKeys = keys.filter((key: Key) => {
-    const loanedTime = key.loantime ? new Date(key.loantime) : new Date();
-    return now > loanedTime;
+    const loanedTime = key.loantime ? new Date(key.loantime) : null;
+    return loanedTime && now > loanedTime;
   });
   const onTimeKeys = keys.filter((key: Key) => !overdueKeys.includes(key));
-
+  console.log('keys', keys);
+  console.log('keys', onTimeKeys);
+  console.log('overdue', overdueKeys);
   return (
     <div className="main-container">
       <div className="app-bar">
@@ -110,35 +112,41 @@ const FacilityManagerMain: React.FC = () => {
       <div className="content">
         <div className="division-1">
           <p>Keys out</p>
-          {onTimeKeys.map((key: Key, index: number) => (
-            <div
-              key={keys[index].id}
-              className="key-div"
-              onClick={() => {
-                setSelectedUser(user[index]);
-                setSelectedKey(key);
-              }}
-            >
-              <p>{keys[index].key_name}</p>
-            </div>
-          ))}
+          {onTimeKeys.map((key: Key) => {
+            const associatedUser =
+              user.find((user) => user.id === key.user) ?? null;
+            return (
+              <div
+                key={key.id}
+                className="key-div"
+                onClick={() => {
+                  setSelectedUser(associatedUser);
+                  setSelectedKey(key);
+                }}
+              >
+                <p>{key.key_name}</p>
+              </div>
+            );
+          })}
         </div>
         <div className="division-2">
           <p>Keys late</p>
-          {overdueKeys.map((key: Key, index: number) => (
-            <div
-              key={key.id}
-              className="key-div"
-              onClick={() => {
-                setSelectedUser(user[index]);
-                setSelectedKey(key);
-              }}
-            >
-              <p>
-                {key.key_name} {user[index] && user[index].user_name}
-              </p>
-            </div>
-          ))}
+          {overdueKeys.map((key: Key) => {
+            const associatedUser =
+              user.find((user) => user.id === key.user) ?? null;
+            return (
+              <div
+                key={key.id}
+                className="key-div"
+                onClick={() => {
+                  setSelectedUser(associatedUser);
+                  setSelectedKey(key);
+                }}
+              >
+                <p>{key.key_name}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
