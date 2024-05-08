@@ -102,10 +102,12 @@ const EmployeeMain: React.FC = () => {
       console.log('user', userResponse);
       // Filter keys to only include keys where key.user equals user.id
       const userKeys = allKeys.filter(
-        (key: Key) => key.user === userResponse.userFromToken.id,
+        (key: Key) =>
+          key.user === userResponse.userFromToken.id && key.loaned === true,
       );
 
-      setKeys(allKeys.filter((key: Key) => key.loaned == false));
+      setKeys(allKeys.filter((key: Key) => key.loaned === false));
+      console.log('keys', keys);
       setUserKeys(userKeys);
       const filteredLateKeys = userKeys.filter(
         (key: Key) => new Date(key.loanedtime as Date) < new Date(),
