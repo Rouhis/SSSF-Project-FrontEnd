@@ -23,53 +23,9 @@ const EmployeeMain: React.FC = () => {
   const [returnTime, setReturnTime] = useState('');
   const [showReturnPopup, setShowReturnPopup] = useState(false);
   const [returnKey, setReturnKey] = useState<Key | null>(null);
+  const [lateKeys, setLateKeys] = useState<Key[]>([]);
   const navigate = useNavigate();
   const token = Cookies.get('token');
-  const [isKeyLate, setIsKeyLate] = useState(false);
-  const [lateKeys, setLateKeys] = useState<Key[]>([]);
-  const [userID, setUserID] = useState('');
-  const [ws, setWs] = useState<WebSocket | null>(null);
-  const [showNotification, setShowNotification] = useState(false);
-  const WebSocketUrl = import.meta.env.VITE_WS_URL;
-  const sendKeyLateMessage = () => {
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      console.log('sending message late key', lateKeys[0].id);
-      ws.send(
-        JSON.stringify({
-          isKeyLate: true,
-        }),
-      );
-    }
-  };
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isKeyLate) {
-      setShowNotification(true);
-      timer = setTimeout(() => {
-        setShowNotification(false);
-      }, 5000);
-    }
-    return () => clearTimeout(timer);
-  }, [isKeyLate]);
-
-  useEffect(() => {
-    if (ws) {
-      console.log('WebSocket ready state:', ws.readyState);
-      ws.onmessage = (event) => {
-        if (event.data) {
-          console.log('Received message from server:', event.data);
-          // Parse the JSON data and handle the message content
-          const message = JSON.parse(event.data);
-          // Handle the message based on its type (e.g., display notification, update UI)
-          console.log('message', message);
-          if (message.message === 'Key is late') {
-            setIsKeyLate(true);
-          }
-        }
-      };
-    }
-  }, [ws]); // Depend on ws state
 
   const handleSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,8 +99,6 @@ const EmployeeMain: React.FC = () => {
         {},
         token,
       );
-      setUserID(userResponse.userFromToken.id);
-      setWs(new WebSocket(`${WebSocketUrl}?userID=${userID}`));
       console.log('user', userResponse);
       // Filter keys to only include keys where key.user equals user.id
       const userKeys = allKeys.filter(
@@ -153,14 +107,16 @@ const EmployeeMain: React.FC = () => {
 
       setKeys(allKeys.filter((key: Key) => key.loaned == false));
       setUserKeys(userKeys);
-      const lateKeys = userKeys.filter(
+      const filteredLateKeys = userKeys.filter(
         (key: Key) => new Date(key.loanedtime as Date) < new Date(),
       );
+      setLateKeys(filteredLateKeys);
       console.log('lateKeys', lateKeys);
-      setLateKeys(lateKeys);
       if (lateKeys.length > 0) {
-        console.log('late');
-        sendKeyLateMessage();
+        const lateKeyNames = lateKeys
+          .map((key: Key) => key.key_name)
+          .join(', ');
+        alert(`You have late keys: ${lateKeyNames}`);
       }
     };
     fetchKeys();
@@ -183,30 +139,6 @@ const EmployeeMain: React.FC = () => {
       >
         Logout
       </button>
-      {/* ... other JSX ... */}
-      {showNotification && (
-        <div
-          className="notification"
-          style={{
-            position: 'fixed',
-            top: '100px',
-            left: '50px', // Changed from right to left
-            zIndex: 1000,
-            backgroundColor: '#333',
-            color: '#ffcccc', // Light red text (complementary)
-            padding: '10px',
-            borderRadius: '5px',
-            boxShadow: '0px 8px 16px 0px rgba(0,0,0,0.2)',
-            fontFamily: 'Arial, sans-serif',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            display: 'flex', // Added for icon placement
-            alignItems: 'center', // Added for icon placement
-          }}
-        >
-          Key is late
-        </div>
-      )}
       {showSettingsPopup && (
         <div className="popup">
           <form onSubmit={handleSettingsSubmit}>
@@ -231,7 +163,6 @@ const EmployeeMain: React.FC = () => {
           <button onClick={() => setShowSettingsPopup(false)}>Close</button>
         </div>
       )}
-      {/* ... other JSX ... */}
       <div className="content">
         <div className="division-1">
           <p>Loaned keys</p>

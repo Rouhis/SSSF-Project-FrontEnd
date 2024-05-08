@@ -83,3 +83,8 @@
   padding: '10px';
   border-radius: '5px';
 }
+
+.late {
+  background-color: red;
+  color: red;
+}
