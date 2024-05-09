@@ -11,7 +11,12 @@ import {Branch} from '../interfaces/Branch';
 import {getUser} from '../functions/users';
 import {fetchOrganizationByName} from '../functions/organizations';
 import {fetchBranchesByOrg} from '../functions/branches';
-
+/**
+ * KeysView component.
+ *
+ * @component
+ * @returns {JSX.Element} KeysView component.
+ */
 const KeysView: React.FC = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [showAddKeyPopup, setShowAddKeyPopup] = useState(false);
@@ -25,7 +30,9 @@ const KeysView: React.FC = () => {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [selectedBranch, setSelectedBranch] = useState('');
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  /**
+   * Asynchronously adds a key.
+   */
   const addKey = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -47,7 +54,9 @@ const KeysView: React.FC = () => {
     setShowAddKeyPopup(false);
     window.location.reload();
   };
-
+  /**
+   * Asynchronously deletes a key.
+   */
   const deleteKey = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -68,7 +77,11 @@ const KeysView: React.FC = () => {
     setShowAddKeyPopup(false);
     window.location.reload();
   };
-
+  /**
+   * Asynchronously fetches branches by user organization.
+   *
+   * @param {string} userOrg - The user's organization.
+   */
   const fetchBranches = async (userOrg: string) => {
     try {
       const organization = await fetchOrganizationByName(apiURL, userOrg);
@@ -80,6 +93,9 @@ const KeysView: React.FC = () => {
     }
   };
 
+  /**
+   * useEffect hook to fetch user and branches when the component mounts.
+   */
   useEffect(() => {
     const fetchUser = async () => {
       const {userFromToken} = (await getUser()) as {userFromToken: User | null}; // Fix: Add type assertion to ensure correct property access
@@ -91,6 +107,9 @@ const KeysView: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /**
+   * useEffect hook to fetch keys and user data when the component mounts or when the apiURL or token changes.
+   */
   useEffect(() => {
     const fetchKeys = async () => {
       try {

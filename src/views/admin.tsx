@@ -10,6 +10,13 @@ import {
 import {Organization} from '../interfaces/Organization';
 import Cookies from 'js-cookie';
 import {useNavigate} from 'react-router-dom';
+
+/**
+ * AdminView component.
+ *
+ * @component
+ * @returns {JSX.Element} AdminView component.
+ */
 const AdminView: React.FC = () => {
   const apiURL = import.meta.env.VITE_API_URL;
   const [showAddOrgPopup, setShowAddOrgPopup] = useState(false);
@@ -32,9 +39,14 @@ const AdminView: React.FC = () => {
   const token = Cookies.get('token');
   const navigate = useNavigate();
 
+  /**
+   * Handles the submission of the settings form.
+   *
+   * @param {React.FormEvent} e - The form event.
+   */
   const handleSettingsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Code to change the username and password goes here
+    // Call the GraphQL fetch function with the updateUser query
     const response = doGraphQLFetch(
       apiURL,
       updateUser,
@@ -46,40 +58,59 @@ const AdminView: React.FC = () => {
       },
       token || '',
     );
+    // If the response is successful, alert the user
     if (await response) {
       alert('Settings updated');
     }
 
+    // Hide the settings popup
     setShowSettingsPopup(false);
   };
+
+  // Function to log out the user
   const logout = () => {
-    // Clear the token or any other cleanup you need to do on logout
+    // Remove the token cookie
     Cookies.remove('token');
-    // Redirect to login page
+    // Navigate to the login page
     navigate('/login');
   };
 
+  /**
+   * Handles the submission of the form to add a new facility manager.
+   *
+   * @param {React.FormEvent} event - The form event.
+   */
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    // Generate a new password for the user
+    // Call the function to add a new facility manager
     addFacilityManager();
+    // Show the password popup
     setShowPasswordPopup(true);
   };
 
+  /**
+   * Handles the submission of the form to add a new organization.
+   *
+   * @param {React.FormEvent} event - The form event.
+   */
   const handleOrgFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    // Call the function to add a new organization
     addOrg();
+    // Hide the add organization popup
     setShowAddOrgPopup(false);
   };
 
+  /**
+   * Asynchronously adds a new organization.
+   */
   const addOrg = async () => {
-    // Add organization logic goes here
     const response = await doGraphQLFetch(
       apiURL,
       addOrganization,
       {
         organization: {
-          organization_name: newOrgName,
+          organization_name: newOrgName, // The name of the new organization
         },
       },
       token,
@@ -91,16 +122,18 @@ const AdminView: React.FC = () => {
     }
   };
 
+  /**
+   * Asynchronously adds a new facility manager.
+   */
   const addFacilityManager = async () => {
-    // Add facility manager logic goes here
     const response = await doGraphQLFetch(
       apiURL,
       addFM,
       {
         user: {
-          email: newUserEmail,
-          user_name: newUserName,
-          organization: currentOrg?.organization_name || '',
+          email: newUserEmail, // The email of the new facility manager
+          user_name: newUserName, // The username of the new facility manager
+          organization: currentOrg?.organization_name || '', // The organization of the new facility manager
         },
       },
       token,
@@ -112,10 +145,13 @@ const AdminView: React.FC = () => {
     }
   };
 
+  /**
+   * Fetches all organizations when the component mounts.
+   */
   useEffect(() => {
     const fetchOrgs = async () => {
       const orgs = await doGraphQLFetch(apiURL, getAllOrgs, {});
-      setOrganizations(orgs.organizations);
+      setOrganizations(orgs.organizations); // Set the organizations state
     };
     fetchOrgs();
   }, [apiURL]);
@@ -176,7 +212,6 @@ const AdminView: React.FC = () => {
               >
                 Add Facility Manager
               </button>
-              {/* Display other organization properties as needed */}
             </div>
           ))}
           {showAddFacilityManagerForOrgPopup && currentOrg && (
@@ -236,7 +271,6 @@ const AdminView: React.FC = () => {
       )}
       {showAddFacilityManagerPopup && (
         <div className="popup">
-          {/* Form to add facility manager goes here */}
           <button onClick={() => setShowAddFacilityManagerPopup(false)}>
             Close
           </button>

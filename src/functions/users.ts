@@ -5,6 +5,11 @@ import Cookies from 'js-cookie';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
+/**
+ * Fetches the user associated with the current token.
+ *
+ * @returns {Promise<User | null>} A promise that resolves to a User object if the token is valid, or null if the token is not found or the fetch fails.
+ */
 export async function getUser(): Promise<User | null> {
   const token = Cookies.get('token');
   if (!token) {

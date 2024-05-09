@@ -1,3 +1,7 @@
+/**
+ * Queries for graphQL fetch
+ */
+
 const login = `mutation Login($credentials: Credentials!) {
     login(credentials: $credentials) {
       token

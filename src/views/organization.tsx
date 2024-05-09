@@ -11,7 +11,12 @@ import {doGraphQLFetch} from '../graphql/fetch';
 import {addBranch, deleteBranch} from '../graphql/queries';
 import Cookies from 'js-cookie';
 import {Organization} from '../interfaces/Organization';
-
+/**
+ * OrganizationView component.
+ *
+ * @component
+ * @returns {JSX.Element} OrganizationView component.
+ */
 const OrganizationView: React.FC = () => {
   const [branches, setBranches] = useState<Branch[]>([]);
   const apiURL = import.meta.env.VITE_API_URL;
@@ -22,6 +27,9 @@ const OrganizationView: React.FC = () => {
   const [newBranchName, setNewBranchName] = useState('');
   const [userOrg, setUserOrg] = useState<Organization | null>(null);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  /**
+   * Asynchronously adds branches.
+   */
   const addBranches = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -43,6 +51,9 @@ const OrganizationView: React.FC = () => {
     setShowAddBranchPopup(false);
     window.location.reload();
   };
+  /**
+   * Asynchronously deletes branches.
+   */
   const deleteBranches = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -60,6 +71,10 @@ const OrganizationView: React.FC = () => {
     setShowAddBranchPopup(false);
     window.location.reload();
   };
+  /**
+   * useEffect hook to fetch user and branches when the component mounts or when the apiURL or token changes.
+   * It fetches the user and their organization, then fetches the branches associated with that organization.
+   */
   useEffect(() => {
     const fetchUserAndBranches = async () => {
       const {userFromToken} = (await getUser()) as {userFromToken: User | null};

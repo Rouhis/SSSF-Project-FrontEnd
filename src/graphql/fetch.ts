@@ -1,3 +1,13 @@
+/**
+ * Performs a GraphQL fetch.
+ *
+ * @param {string} url - The URL of the GraphQL server.
+ * @param {string} query - The GraphQL query to execute.
+ * @param {object} variables - The variables to include in the query.
+ * @param {string} [token] - The authorization token (optional).
+ * @returns {Promise<object>} A promise that resolves to the data returned by the query.
+ * @throws {Error} If the fetch fails.
+ */
 const doGraphQLFetch = async (
   url: string,
   query: string,

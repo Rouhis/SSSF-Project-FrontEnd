@@ -19,7 +19,12 @@ import {faComments} from '@fortawesome/free-solid-svg-icons';
 import {Message} from '../interfaces/Message';
 
 const apiURL = import.meta.env.VITE_API_URL;
-
+/**
+ * FacilityManagerMain component.
+ *
+ * @component
+ * @returns {JSX.Element} FacilityManagerMain component.
+ */
 const FacilityManagerMain: React.FC = () => {
   const [keys, setKeys] = useState<Key[]>([]);
   const {token} = useContext(AuthContext);
@@ -39,6 +44,12 @@ const FacilityManagerMain: React.FC = () => {
   const websocketUrl = import.meta.env.VITE_WS_URL;
   const navigate = useNavigate();
   const cookieToken = Cookies.get('token');
+  /**
+   * useEffect hook to handle WebSocket connection and messages.
+   *
+   * @function
+   * @returns {void}
+   */
   useEffect(() => {
     if (userId?.id) {
       const wsServer = new WebSocket(websocketUrl + '?userId=' + userId.id);
@@ -68,10 +79,18 @@ const FacilityManagerMain: React.FC = () => {
       };
     }
   }, [userId?.id]);
+
+  /**
+   * Handles the change event for the user selection.
+   *
+   * @param {React.ChangeEvent<HTMLSelectElement>} event - The change event.
+   */
   const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedChatUser(event.target.value);
   };
-
+  /**
+   * Handles the opening and closing of messages.
+   */
   const handleOpenMessages = () => {
     if (showMessages === false) {
       getUsers();
@@ -81,20 +100,34 @@ const FacilityManagerMain: React.FC = () => {
     }
   };
 
+  /**
+   * Handles the submission of the form.
+   *
+   * @param {React.FormEvent} event - The form event.
+   */
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     handleSendMessage();
   };
+  /**
+   * Handles the change event for the input field.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} event - The change event.
+   */
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
   };
+
+  /**
+   * Handles sending a message.
+   */
   const handleSendMessage = () => {
     if (ws) {
       ws.send(
         JSON.stringify({
           content: message,
           recipient: selectedChatUser,
-          sender: userId?.id, // Add null check for userId
+          sender: userId?.id,
         }),
       );
       setMessages((prevMessages) => [
@@ -107,16 +140,25 @@ const FacilityManagerMain: React.FC = () => {
       ]);
     }
   };
-  const logout = () => {
-    // Clear the token or any other cleanup you need to do on logout
 
+  /**
+   * Handles user logout.
+   */
+  const logout = () => {
+    // Clear the token
     Cookies.remove('token');
     // Redirect to login page
     navigate('/login');
   };
+
+  /**
+   * Handles the submission of the settings form.
+   *
+   * @param {React.FormEvent} e - The form event.
+   */
   const handleSettingsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Code to change the username and password goes here
+    // Code to change the username and password
     const response = doGraphQLFetch(
       apiURL,
       updateUser,
@@ -129,7 +171,7 @@ const FacilityManagerMain: React.FC = () => {
       token || '',
     );
     try {
-      const result = await response; // Add await keyword here
+      const result = await response;
       console.log('Promise is fulfilled', result);
       alert('Information updated');
     } catch (error) {
@@ -139,6 +181,9 @@ const FacilityManagerMain: React.FC = () => {
     setShowSettingsPopup(false);
   };
 
+  /**
+   * Asynchronously gets users by organization.
+   */
   const getUsers = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -149,6 +194,9 @@ const FacilityManagerMain: React.FC = () => {
     setUsers(response.usersByOrganization);
   };
 
+  /**
+   * useEffect hook to fetch keys and user data when the component mounts or when the token or cookieToken changes.
+   */
   useEffect(() => {
     const fetchKeys = async () => {
       try {
@@ -196,11 +244,22 @@ const FacilityManagerMain: React.FC = () => {
     fetchKeys();
   }, [token, cookieToken]);
 
+  /**
+   * Current date and time.
+   */
   const now = new Date();
+
+  /**
+   * Filters keys to find those that are overdue.
+   */
   const overdueKeys = keys.filter((key: Key) => {
     const loanedTime = key.loantime ? new Date(key.loantime) : null;
     return loanedTime && now > loanedTime;
   });
+
+  /**
+   * Filters keys to find those that are on time (not overdue).
+   */
   const onTimeKeys = keys.filter((key: Key) => !overdueKeys.includes(key));
   return (
     <div className="main-container">

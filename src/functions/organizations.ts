@@ -2,6 +2,13 @@ import {doGraphQLFetch} from '../graphql/fetch';
 import {orgById, organizationByName} from '../graphql/queries';
 import {Organization} from '../interfaces/Organization';
 
+/**
+ * Fetches an organization by its name.
+ *
+ * @param {string} apiURL - The URL of the API.
+ * @param {string} userOrg - The name of the organization.
+ * @returns {Promise<Organization | null>} A promise that resolves to an organization or null.
+ */
 const fetchOrganizationByName = async (
   apiURL: string,
   userOrg: string,
@@ -13,6 +20,13 @@ const fetchOrganizationByName = async (
   return response.organizationByName;
 };
 
+/**
+ * Fetches an organization by its ID.
+ *
+ * @param {string} apiURL - The URL of the API.
+ * @param {string} userOrg - The ID of the organization.
+ * @returns {Promise<Organization | null>} A promise that resolves to an organization or null.
+ */
 const fetchOrganizationById = async (
   apiURL: string,
   userOrg: string,

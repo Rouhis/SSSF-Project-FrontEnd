@@ -8,7 +8,12 @@ import {doGraphQLFetch} from '../graphql/fetch';
 import {addEmployee, deleteUser, usersByOrganization} from '../graphql/queries';
 import {Organization} from '../interfaces/Organization';
 import Cookies from 'js-cookie';
-
+/**
+ * EmployeesView component.
+ *
+ * @component
+ * @returns {JSX.Element} EmployeesView component.
+ */
 const EmployeesView: React.FC = () => {
   const apiURL = import.meta.env.VITE_API_URL;
   const [employees, setEmployees] = useState<User[]>([]);
@@ -21,7 +26,9 @@ const EmployeesView: React.FC = () => {
   const [userOrg, setUserOrg] = useState<Organization | null>(null);
   const [showAddedPopup, setShowAddedPopup] = useState(false);
   const [addedUserPassword, setAddedUserPassword] = useState('');
-  // Fetch employees and other necessary data here...
+  /**
+   * Asynchronously fetches employees and other necessary data.
+   */
   const fetchedEmployess = async () => {
     const {userFromToken} = (await getUser()) as {userFromToken: User | null};
     let usersOrg: Organization | null = null;
@@ -37,6 +44,9 @@ const EmployeesView: React.FC = () => {
     });
     setEmployees(data.usersByOrganization || []);
   };
+  /**
+   * Asynchronously adds a new employee.
+   */
   const addnewEmployee = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -60,6 +70,9 @@ const EmployeesView: React.FC = () => {
       alert('Error adding employee ');
     }
   };
+  /**
+   * Asynchronously deletes an employee.
+   */
   const deleteEmployee = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -79,6 +92,9 @@ const EmployeesView: React.FC = () => {
 
     window.location.reload();
   };
+  /**
+   * useEffect hook to fetch employees when the component mounts.
+   */
   useEffect(() => {
     fetchedEmployess();
   }, []);
@@ -99,7 +115,7 @@ const EmployeesView: React.FC = () => {
               className="employee-div"
               onClick={() => {
                 setSelectedEmployee(employee);
-                setShowPopup(true); // Show the popup when a branch is clicked
+                setShowPopup(true);
               }}
             >
               <p>{employee.user_name}</p>

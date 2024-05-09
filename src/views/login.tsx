@@ -8,6 +8,12 @@ import {useNavigate} from 'react-router-dom';
 
 const apiURL = import.meta.env.VITE_API_URL;
 
+/**
+ * LoginView component.
+ *
+ * @component
+ * @returns {JSX.Element} LoginView component.
+ */
 const LoginView: React.FC = () => {
   const [username, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,15 +22,27 @@ const LoginView: React.FC = () => {
   const {setToken} = React.useContext(AuthContext) as {
     setToken: (token: string) => void;
   };
-
+  /**
+   * Handles the change of the email input field.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input field event.
+   */
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
   };
-
+  /**
+   * Handles the change of the password input field.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The input field event.
+   */
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
-
+  /**
+   * Handles the submission of the login form.
+   *
+   * @param {React.FormEvent} e - The form event.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -46,6 +64,9 @@ const LoginView: React.FC = () => {
       console.error(error);
     }
   };
+  /**
+   * Navigates to the register page.
+   */
   const navigateRegister = () => {
     navigate('/register');
   };

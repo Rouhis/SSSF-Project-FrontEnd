@@ -17,7 +17,12 @@ import {faComments} from '@fortawesome/free-solid-svg-icons';
 import {Message} from '../interfaces/Message';
 
 const apiURL = import.meta.env.VITE_API_URL;
-
+/**
+ * EmployeeMain component.
+ *
+ * @component
+ * @returns {JSX.Element} EmployeeMain component.
+ */
 const EmployeeMain: React.FC = () => {
   const [keys, setKeys] = useState<Key[]>([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -40,7 +45,12 @@ const EmployeeMain: React.FC = () => {
   const navigate = useNavigate();
   const token = Cookies.get('token') || '';
   const websocketUrl = import.meta.env.VITE_WS_URL;
-
+  /**
+   * useEffect hook to handle WebSocket connection and messages.
+   *
+   * @function
+   * @returns {void}
+   */
   useEffect(() => {
     if (userId) {
       const wsServer = new WebSocket(websocketUrl + '?userId=' + userId);
@@ -70,10 +80,18 @@ const EmployeeMain: React.FC = () => {
     }
   }, [userId]);
 
+  /**
+   * Handles the change event for the user selection.
+   *
+   * @param {React.ChangeEvent<HTMLSelectElement>} event - The change event.
+   */
   const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedUser(event.target.value);
   };
 
+  /**
+   * Handles the opening and closing of messages.
+   */
   const handleOpenMessages = () => {
     if (showMessages === false) {
       getUsers();
@@ -83,13 +101,27 @@ const EmployeeMain: React.FC = () => {
     }
   };
 
+  /**
+   * Handles the submission of the form.
+   *
+   * @param {React.FormEvent} event - The form event.
+   */
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     handleSendMessage();
   };
+
+  /**
+   * Handles the change event for the input field.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} event - The change event.
+   */
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
   };
+  /**
+   * Handles sending a message.
+   */
   const handleSendMessage = () => {
     if (ws) {
       ws.send(
@@ -109,6 +141,9 @@ const EmployeeMain: React.FC = () => {
       ]);
     }
   };
+  /**
+   * Asynchronously gets users by organization.
+   */
   const getUsers = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -118,10 +153,12 @@ const EmployeeMain: React.FC = () => {
     );
     setUsers(response.usersByOrganization);
   };
+  /**
+   * Asynchronously updates the user information.
+   */
   const handleSettingsSubmit = async (e: React.FormEvent) => {
-    // Add async keyword here
     e.preventDefault();
-    // Code to change the username and password goes here
+    // Code to change the username and password
     const response = doGraphQLFetch(
       apiURL,
       updateUser,
@@ -134,7 +171,7 @@ const EmployeeMain: React.FC = () => {
       token,
     );
     try {
-      const result = await response; // Add await keyword here
+      const result = await response;
       console.log('Promise is fulfilled', result);
       alert('Information updated');
     } catch (error) {
@@ -144,11 +181,14 @@ const EmployeeMain: React.FC = () => {
     setShowSettingsPopup(false);
   };
   const logout = () => {
-    // Clear the token or any other cleanup you need to do on logout
+    // Clear the token
     Cookies.remove('token');
     // Redirect to login page
     navigate('/login');
   };
+  /**
+   * Asynchronously returns keys.
+   */
   const returnKeys = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -168,6 +208,9 @@ const EmployeeMain: React.FC = () => {
       alert('Error');
     }
   };
+  /**
+   * Asynchronously loans keys.
+   */
   const loanKeys = async () => {
     const response = await doGraphQLFetch(
       apiURL,
@@ -187,7 +230,9 @@ const EmployeeMain: React.FC = () => {
       alert('Error');
     }
   };
-
+  /**
+   * useEffect hook to fetch keys and user data when the component mounts or when the token changes.
+   */
   useEffect(() => {
     const fetchKeys = async () => {
       const data = await doGraphQLFetch(apiURL, keysByOrg, {
