@@ -20,7 +20,6 @@ const App: React.FC = () => {
     const token = Cookies.get('token');
     if (token) {
       const data = await doGraphQLFetch(apiURL, checkToken, {}, token);
-      console.log(data.checkToken.user.role);
       setUserRoles(data.checkToken.user.role.split(',')); // Assuming roles are comma-separated (adjust if needed)
     }
   };

@@ -19,7 +19,6 @@ export async function getUser(): Promise<User | null> {
       {},
       token,
     )) as User;
-    console.log('user', user);
     return user;
   } catch (error) {
     console.error('Error fetching user:', error);

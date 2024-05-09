@@ -31,7 +31,6 @@ const LoginView: React.FC = () => {
       const data = await doGraphQLFetch(apiURL, login, {
         credentials: {username, password},
       });
-      console.log(data.login);
       setToken(data.login.token);
       Cookies.set('token', data.login.token);
       if (data.login.user.role === 'manager') {

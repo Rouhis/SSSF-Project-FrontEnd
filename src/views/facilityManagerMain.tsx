@@ -58,7 +58,6 @@ const FacilityManagerMain: React.FC = () => {
               content: message.content,
             },
           ]);
-          console.log('Messages:', messages);
         }
       };
       wsServer.onerror = (error) => {
@@ -115,7 +114,7 @@ const FacilityManagerMain: React.FC = () => {
     // Redirect to login page
     navigate('/login');
   };
-  const handleSettingsSubmit = (e: React.FormEvent) => {
+  const handleSettingsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Code to change the username and password goes here
     const response = doGraphQLFetch(
@@ -129,7 +128,14 @@ const FacilityManagerMain: React.FC = () => {
       },
       token || '',
     );
-    console.log('res', response);
+    try {
+      const result = await response; // Add await keyword here
+      console.log('Promise is fulfilled', result);
+      alert('Information updated');
+    } catch (error) {
+      console.log('Promise is rejected', error);
+      alert('Information not updated');
+    }
     setShowSettingsPopup(false);
   };
 
@@ -141,7 +147,6 @@ const FacilityManagerMain: React.FC = () => {
       cookieToken,
     );
     setUsers(response.usersByOrganization);
-    console.log('res', response);
   };
 
   useEffect(() => {
@@ -150,7 +155,6 @@ const FacilityManagerMain: React.FC = () => {
         const data = await doGraphQLFetch(apiURL, keysOut, {
           token: token || Cookies.get('token'),
         });
-        console.log(data);
         setKeys(data.keysOut || []);
         const userResponse = await doGraphQLFetch(
           apiURL,
@@ -190,7 +194,7 @@ const FacilityManagerMain: React.FC = () => {
     };
 
     fetchKeys();
-  }, [token]);
+  }, [token, cookieToken]);
 
   const now = new Date();
   const overdueKeys = keys.filter((key: Key) => {

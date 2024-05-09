@@ -17,11 +17,9 @@ const fetchOrganizationById = async (
   apiURL: string,
   userOrg: string,
 ): Promise<Organization | null> => {
-  console.log('userOrg12', userOrg);
   const response = await doGraphQLFetch(apiURL, orgById, {
     organizationByIdId: userOrg,
   });
-  console.log('response', response);
   return response.organizationById;
 };
 

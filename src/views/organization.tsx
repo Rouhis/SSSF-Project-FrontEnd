@@ -34,15 +34,16 @@ const OrganizationView: React.FC = () => {
       },
       Cookies.get('token'),
     );
-    console.log('res', response);
-    if (response.data) {
+    if (response.addBranch) {
       setBranches((prevBranches) => [...prevBranches, response.data.addBranch]);
+      alert('Branch added');
+    } else {
+      alert('Error adding branch');
     }
     setShowAddBranchPopup(false);
     window.location.reload();
   };
   const deleteBranches = async () => {
-    console.log('selected', selectedBranch);
     const response = await doGraphQLFetch(
       apiURL,
       deleteBranch,
@@ -51,9 +52,10 @@ const OrganizationView: React.FC = () => {
       },
       Cookies.get('token'),
     );
-    console.log('res', response);
-    if (response) {
-      console.log('deleted');
+    if (response.deleteBranch) {
+      alert('Branch deleted');
+    } else {
+      alert('Error deleting branch');
     }
     setShowAddBranchPopup(false);
     window.location.reload();
@@ -61,7 +63,6 @@ const OrganizationView: React.FC = () => {
   useEffect(() => {
     const fetchUserAndBranches = async () => {
       const {userFromToken} = (await getUser()) as {userFromToken: User | null};
-      console.log('user', userFromToken);
 
       if (userFromToken?.organization) {
         const usersOrg = await fetchOrganizationByName(
@@ -75,7 +76,6 @@ const OrganizationView: React.FC = () => {
         );
         if (fetchedBranches) {
           setBranches(fetchedBranches);
-          console.log('branches', fetchedBranches);
         } else {
           console.error('No branches found');
         }

@@ -32,7 +32,7 @@ const AdminView: React.FC = () => {
   const token = Cookies.get('token');
   const navigate = useNavigate();
 
-  const handleSettingsSubmit = (e: React.FormEvent) => {
+  const handleSettingsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Code to change the username and password goes here
     const response = doGraphQLFetch(
@@ -46,7 +46,10 @@ const AdminView: React.FC = () => {
       },
       token || '',
     );
-    console.log('res', response);
+    if (await response) {
+      alert('Settings updated');
+    }
+
     setShowSettingsPopup(false);
   };
   const logout = () => {
@@ -81,8 +84,10 @@ const AdminView: React.FC = () => {
       },
       token,
     );
-    if (response) {
-      console.log('added');
+    if (response.addOrganization) {
+      alert('Organization added');
+    } else {
+      alert('Organization not added');
     }
   };
 
@@ -100,18 +105,16 @@ const AdminView: React.FC = () => {
       },
       token,
     );
-    console.log('res', response);
-    if (response) {
+    if (response.registerFaciltyManager) {
       setNewUserPassword(response.registerFaciltyManager.password);
-      console.log('added');
-      console.log('password', response.registerFaciltyManager.password);
+    } else {
+      alert('Facility Manager not added');
     }
   };
 
   useEffect(() => {
     const fetchOrgs = async () => {
       const orgs = await doGraphQLFetch(apiURL, getAllOrgs, {});
-      console.log('orgs', orgs);
       setOrganizations(orgs.organizations);
     };
     fetchOrgs();

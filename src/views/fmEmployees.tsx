@@ -35,11 +35,9 @@ const EmployeesView: React.FC = () => {
     const data = await doGraphQLFetch(apiURL, usersByOrganization, {
       organization: usersOrg?.organization_name || '',
     });
-    console.log('data', data);
     setEmployees(data.usersByOrganization || []);
   };
   const addnewEmployee = async () => {
-    console.log('selected', newUserName, newUserEmail, userOrg?.id || '');
     const response = await doGraphQLFetch(
       apiURL,
       addEmployee,
@@ -52,17 +50,17 @@ const EmployeesView: React.FC = () => {
       },
       Cookies.get('token'),
     );
-    console.log('res', response.registerEmployee.password);
-    if (response) {
+    if (response.addEmployee) {
       // Add the new key to the keys array
       setAddedUserPassword(response.registerEmployee.password);
-      console.log('added');
+      alert('Employee added');
       setShowAddPopup(false);
       setShowAddedPopup(true);
+    } else {
+      alert('Error adding employee ');
     }
   };
   const deleteEmployee = async () => {
-    console.log('selected', selectedEmployee?.id);
     const response = await doGraphQLFetch(
       apiURL,
       deleteUser,
@@ -72,9 +70,10 @@ const EmployeesView: React.FC = () => {
       Cookies.get('token'),
     );
 
-    console.log('res', response);
-    if (response.data) {
-      console.log('deleted');
+    if (response.deleteUser) {
+      alert('User deleted');
+    } else {
+      alert('User not deleted');
     }
     setShowDeleteConfirmation(false);
 

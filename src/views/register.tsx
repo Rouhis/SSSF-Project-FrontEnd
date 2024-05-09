@@ -31,12 +31,15 @@ const RegisterForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(apiURL);
     try {
       const data = await doGraphQLFetch(apiURL, register, {
         user: {email, password, organization, user_name},
       });
-      console.log(data);
+      if (data.registerTestUser) {
+        alert('Registration successful');
+      } else {
+        alert('Error registering user');
+      }
       navigate('/login');
     } catch (error) {
       console.error(error);

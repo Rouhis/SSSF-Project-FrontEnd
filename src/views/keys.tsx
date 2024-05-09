@@ -27,7 +27,6 @@ const KeysView: React.FC = () => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const addKey = async () => {
-    console.log('selected', selectedBranch);
     const response = await doGraphQLFetch(
       apiURL,
       addKeys,
@@ -39,18 +38,17 @@ const KeysView: React.FC = () => {
       },
       Cookies.get('token'),
     );
-    console.log('res', response);
-    if (response.data) {
-      // Add the new key to the keys array
-      setKeys((prevKeys) => [...prevKeys, response.data.addKey]);
+    if (response.addKey) {
+      alert('Key added');
+      setKeys((prevKeys) => [...prevKeys, response.addKey]);
+    } else {
+      alert('Error adding key');
     }
     setShowAddKeyPopup(false);
-
     window.location.reload();
   };
 
   const deleteKey = async () => {
-    console.log('selected', selectedBranch);
     const response = await doGraphQLFetch(
       apiURL,
       deleteKeys,
@@ -59,10 +57,12 @@ const KeysView: React.FC = () => {
       },
       Cookies.get('token'),
     );
-    console.log('res', response);
-    if (response.data) {
+
+    if (response.deleteKey) {
       // Add the new key to the keys array
-      console.log('key deleted');
+      alert('Key Deleted');
+    } else {
+      alert('Error deleting key');
     }
     setShowDeleteConfirmation(false);
     setShowAddKeyPopup(false);
@@ -71,11 +71,8 @@ const KeysView: React.FC = () => {
 
   const fetchBranches = async (userOrg: string) => {
     try {
-      console.log('org1', userOrg);
       const organization = await fetchOrganizationByName(apiURL, userOrg);
-      console.log('org', organization?.id); // Fix: Add null check before accessing the 'id' property
-      const branches = await fetchBranchesByOrg(apiURL, organization?.id ?? ''); // Fix: Use nullish coalescing operator to provide a default value of an empty string
-      console.log('branches', branches);
+      const branches = await fetchBranchesByOrg(apiURL, organization?.id ?? '');
       setBranches(branches);
     } catch (error) {
       console.error(error);
@@ -86,7 +83,7 @@ const KeysView: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const {userFromToken} = (await getUser()) as {userFromToken: User | null}; // Fix: Add type assertion to ensure correct property access
-      console.log('user2', userFromToken);
+
       fetchBranches(userFromToken?.organization ?? ''); // Fix: Add nullish coalescing operator to provide a default value of an empty string
     };
 
@@ -100,7 +97,6 @@ const KeysView: React.FC = () => {
         const data = await doGraphQLFetch(apiURL, keysByOrg, {
           token: token || Cookies.get('token'),
         });
-        console.log(data);
         setKeys(data.keysByOrganization || []);
         // Fetch users for each key
         const users = await Promise.all(
@@ -115,9 +111,6 @@ const KeysView: React.FC = () => {
             }
           }),
         );
-
-        console.log(users);
-        // Extract the user data from the responses
         const usersData = users.map((response) => {
           if (response?.userById) {
             return response.userById;
@@ -208,9 +201,7 @@ const KeysView: React.FC = () => {
               <select
                 value={selectedBranch}
                 onChange={(e) => {
-                  console.log('onChange event triggered');
                   setSelectedBranch(e.target.value);
-                  console.log('Selected branch id:', e.target.value);
                 }}
               >
                 <option value="" disabled selected>

@@ -30,7 +30,6 @@ const EmployeeMain: React.FC = () => {
   const [showReturnPopup, setShowReturnPopup] = useState(false);
   const [returnKey, setReturnKey] = useState<Key | null>(null);
   const [selectedUser, setSelectedUser] = useState<string>('');
-  const [lateKeys, setLateKeys] = useState<Key[]>([]);
   const [userId, setUserId] = useState('');
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -52,7 +51,6 @@ const EmployeeMain: React.FC = () => {
       wsServer.onmessage = (event) => {
         if (event.data) {
           const message = JSON.parse(event.data);
-          console.log('Message received:', message.message);
           setMessages((prevMessages) => [
             ...prevMessages,
             {
@@ -61,7 +59,6 @@ const EmployeeMain: React.FC = () => {
               content: message.content,
             },
           ]);
-          console.log('Messages:', messages);
         }
       };
       wsServer.onerror = (error) => {
@@ -120,9 +117,9 @@ const EmployeeMain: React.FC = () => {
       token,
     );
     setUsers(response.usersByOrganization);
-    console.log('res', response);
   };
-  const handleSettingsSubmit = (e: React.FormEvent) => {
+  const handleSettingsSubmit = async (e: React.FormEvent) => {
+    // Add async keyword here
     e.preventDefault();
     // Code to change the username and password goes here
     const response = doGraphQLFetch(
@@ -136,7 +133,14 @@ const EmployeeMain: React.FC = () => {
       },
       token,
     );
-    console.log('res', response);
+    try {
+      const result = await response; // Add await keyword here
+      console.log('Promise is fulfilled', result);
+      alert('Information updated');
+    } catch (error) {
+      console.log('Promise is rejected', error);
+      alert('Information not updated');
+    }
     setShowSettingsPopup(false);
   };
   const logout = () => {
@@ -146,7 +150,6 @@ const EmployeeMain: React.FC = () => {
     navigate('/login');
   };
   const returnKeys = async () => {
-    console.log(String(Date.now()));
     const response = await doGraphQLFetch(
       apiURL,
       loanKey,
@@ -158,9 +161,12 @@ const EmployeeMain: React.FC = () => {
       },
       token,
     );
-    console.log('res', response);
-    setShowReturnPopup(false);
-    window.location.reload();
+    if (response.loanKey) {
+      setShowReturnPopup(false);
+      window.location.reload();
+    } else {
+      alert('Error');
+    }
   };
   const loanKeys = async () => {
     const response = await doGraphQLFetch(
@@ -174,9 +180,12 @@ const EmployeeMain: React.FC = () => {
       },
       token,
     );
-    console.log('res', response);
-    setShowPopup(false);
-    window.location.reload();
+    if (response.loanKey) {
+      setShowReturnPopup(false);
+      window.location.reload();
+    } else {
+      alert('Error');
+    }
   };
 
   useEffect(() => {
@@ -185,7 +194,6 @@ const EmployeeMain: React.FC = () => {
         token: token,
       });
       const allKeys = data.keysByOrganization || [];
-      console.log('allKeys', allKeys);
       setKeys(allKeys);
       // Fetch user
       const userResponse = await doGraphQLFetch(
@@ -194,7 +202,6 @@ const EmployeeMain: React.FC = () => {
         {},
         token,
       );
-      console.log('user', userResponse);
       setUserId(userResponse.userFromToken.id);
       setUser(userResponse.userFromToken);
       // Filter keys to only include keys where key.user equals user.id
@@ -204,13 +211,7 @@ const EmployeeMain: React.FC = () => {
       );
 
       setKeys(allKeys.filter((key: Key) => key.loaned === false));
-      console.log('keys', keys);
       setUserKeys(userKeys);
-      const filteredLateKeys = userKeys.filter(
-        (key: Key) => new Date(key.loanedtime as Date) < new Date(),
-      );
-      setLateKeys(filteredLateKeys);
-      console.log('lateKeys', lateKeys);
     };
     fetchKeys();
   }, [token]);
