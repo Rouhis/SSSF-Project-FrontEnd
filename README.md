@@ -1,32 +1,31 @@
-# React + TypeScript + Vite
+# SSSF-Project-FrontEnd
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Installation
 
-Currently, two official plugins are available:
+Follow these steps to install and run the project:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-};
+```bash
+ git clone project-name
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+```bash
+npm install
+```
 
-# SSSF-Project-FrontEnd
+The project uses the following environment variables:
+
+- `VITE_API_URL`: The URL of the GraphQL API.
+- `VITE_WS_URL`: The URL of the WebSocket server.
+
+You need to create a `.env` file in the root of the project and set these variables. Here's an example of what your `.env` file could look like:
+
+```properties
+VITE_API_URL=https://your-graphql-api-url
+VITE_WS_URL=wss://your-websocket-server-url
+```
+
+```bash
+npm run dev
+```
+
+Other servers can be found from [SSSF-Project](https://github.com/Rouhis/SSSF-Project)
