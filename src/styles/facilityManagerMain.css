@@ -103,3 +103,107 @@
   outline: none;
   box-shadow: none;
 }
+.message-container {
+  position: fixed;
+  bottom: 60px; /* 10px from the bottom of the screen */
+  right: 130px; /* 10px from the right edge of the screen */
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  height: 475px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 10px; /* Add padding to the container */
+}
+
+.message-container select {
+  width: 100%; /* Make the select element take up the full width of the container */
+  margin-bottom: 10px; /* Add some margin below the select element */
+  padding: 5px; /* Add some padding to the select element */
+  border-radius: 5px;
+  color: #333;
+  background-color: #f0f0f0; /* Round the corners of the select element */
+}
+.message-container input {
+  width: 95%; /* Make the select element take up the full width of the container */
+  margin-bottom: 10px; /* Add some margin below the select element */
+  padding: 5px; /* Add some padding to the select element */
+  border-radius: 5px;
+  color: #333;
+  background-color: #f0f0f0; /* Round the corners of the select element */
+}
+
+.messages::-webkit-scrollbar {
+  width: 5px;
+}
+.messages::-webkit-scrollbar-thumb {
+  background-color: #007bff;
+}
+.messages::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+.message-container button {
+  width: 100%; /* Make the button take up the full width of the container */
+  padding: 10px; /* Add some padding to the button */
+  border: none; /* Remove the default border */
+  border-radius: 5px; /* Round the corners of the button */
+  background-color: #007bff; /* Make the button blue */
+  color: white; /* Make the text on the button white */
+  cursor: pointer; /* Change the cursor when hovering over the button */
+}
+
+.message-container button:hover {
+  background-color: #0056b3; /* Darken the button when hovering over it */
+}
+
+.messages {
+  width: 100%; /* Use full width of the container */
+  height: 425px;
+  overflow-y: scroll;
+  padding: 10px;
+}
+
+.message {
+  max-width: 70%;
+  font-size: small;
+  margin: 10px;
+  padding: 10px; /* More padding for better readability */
+  border-radius: 10px;
+  background-color: #fff; /* White background for better contrast */
+  color: #333; /* Dark text for better contrast */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.message.other {
+  margin-right: auto; /* Align other messages to the left */
+  background-color: #f0f0f0; /* Lighter background for better contrast */
+  color: #333;
+}
+
+.message:not(.other) {
+  margin-left: auto; /* Align own messages to the right */
+  background-color: #dcf8c6;
+  color: #333;
+}
+
+.open-messages-button {
+  position: fixed; /* Fixed positioning */
+  bottom: 60px; /* 10px from the bottom of the screen */
+  right: 50px; /* 10px from the right edge of the screen */
+  width: 70px; /* Width of the button */
+  height: 70px; /* Height of the button */
+  border-radius: 50%; /* Make the button round */
+  background-color: #007bff; /* Make the button blue */
+  color: white; /* Make the text on the button white */
+  border: none; /* Remove the default border */
+  cursor: pointer; /* Change the cursor when hovering over the button */
+  display: flex; /* Use flexbox for centering */
+  justify-content: center; /* Center the text horizontally */
+  align-items: center; /* Center the text vertically */
+  font-size: 24px; /* Increase the font size */
+}
+
+.open-messages-button:hover {
+  background-color: #0056b3; /* Darken the button when hovering over it */
+}

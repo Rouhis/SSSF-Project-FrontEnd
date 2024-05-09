@@ -5,11 +5,17 @@ import {
   loanKey,
   updateUser,
   userFromToken,
+  usersByOrganization,
 } from '../graphql/queries';
 import Cookies from 'js-cookie';
 import {Key} from '../interfaces/Key';
 import '../styles/facilityManagerMain.css';
 import {useNavigate} from 'react-router-dom';
+import {User} from '../interfaces/User';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faComments} from '@fortawesome/free-solid-svg-icons';
+import {Message} from '../interfaces/Message';
+
 const apiURL = import.meta.env.VITE_API_URL;
 
 const EmployeeMain: React.FC = () => {
@@ -23,9 +29,99 @@ const EmployeeMain: React.FC = () => {
   const [returnTime, setReturnTime] = useState('');
   const [showReturnPopup, setShowReturnPopup] = useState(false);
   const [returnKey, setReturnKey] = useState<Key | null>(null);
+  const [selectedUser, setSelectedUser] = useState<string>('');
   const [lateKeys, setLateKeys] = useState<Key[]>([]);
+  const [userId, setUserId] = useState('');
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [showMessages, setShowMessages] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
   const navigate = useNavigate();
   const token = Cookies.get('token') || '';
+  const websocketUrl = import.meta.env.VITE_WS_URL2;
+
+  useEffect(() => {
+    if (userId) {
+      const wsServer = new WebSocket(websocketUrl + '?userId=' + userId);
+      setWs(wsServer);
+      wsServer.onopen = () => {
+        console.log('WebSocket connection opened');
+      };
+      wsServer.onmessage = (event) => {
+        if (event.data) {
+          const message = JSON.parse(event.data);
+          console.log('Message received:', message.message);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              sender: userId,
+              recipient: message.recipient,
+              content: message.content,
+            },
+          ]);
+          console.log('Messages:', messages);
+        }
+      };
+      wsServer.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      wsServer.onclose = () => {
+        console.log('WebSocket connection closed');
+      };
+    }
+  }, [userId]);
+
+  const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedUser(event.target.value);
+  };
+
+  const handleOpenMessages = () => {
+    if (showMessages === false) {
+      getUsers();
+      setShowMessages(true);
+    } else {
+      setShowMessages(false);
+    }
+  };
+
+  const handleFormSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    handleSendMessage();
+  };
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(event.target.value);
+  };
+  const handleSendMessage = () => {
+    if (ws) {
+      ws.send(
+        JSON.stringify({
+          content: message,
+          recipient: selectedUser,
+          sender: userId,
+        }),
+      );
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          sender: userId,
+          recipient: selectedUser,
+          content: message,
+        },
+      ]);
+    }
+  };
+  const getUsers = async () => {
+    const response = await doGraphQLFetch(
+      apiURL,
+      usersByOrganization,
+      {organization: user?.organization || ''},
+      token,
+    );
+    setUsers(response.usersByOrganization);
+    console.log('res', response);
+  };
   const handleSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Code to change the username and password goes here
@@ -99,6 +195,8 @@ const EmployeeMain: React.FC = () => {
         token,
       );
       console.log('user', userResponse);
+      setUserId(userResponse.userFromToken.id);
+      setUser(userResponse.userFromToken);
       // Filter keys to only include keys where key.user equals user.id
       const userKeys = allKeys.filter(
         (key: Key) =>
@@ -113,12 +211,6 @@ const EmployeeMain: React.FC = () => {
       );
       setLateKeys(filteredLateKeys);
       console.log('lateKeys', lateKeys);
-      if (lateKeys.length > 0) {
-        const lateKeyNames = lateKeys
-          .map((key: Key) => key.key_name)
-          .join(', ');
-        alert(`You have late keys: ${lateKeyNames}`);
-      }
     };
     fetchKeys();
   }, [token]);
@@ -140,6 +232,50 @@ const EmployeeMain: React.FC = () => {
       >
         Logout
       </button>
+      <div>
+        <button className="open-messages-button" onClick={handleOpenMessages}>
+          <FontAwesomeIcon icon={faComments} />
+        </button>
+
+        {showMessages && (
+          <div className="message-container">
+            <div className="messages">
+              <select onChange={handleUserChange}>
+                {users.map((user, index) => (
+                  <option key={index} value={user.id}>
+                    {user.user_name}
+                  </option>
+                ))}
+              </select>
+
+              {messages
+                .filter(
+                  (message) =>
+                    message.sender === userId ||
+                    message.recipient === selectedUser,
+                )
+                .map((message, index) => {
+                  let messageClass = '';
+                  if (message.recipient === userId) {
+                    messageClass = 'message other';
+                  } else if (message.sender === userId) {
+                    messageClass = 'message';
+                  }
+
+                  return (
+                    <div key={index} className={messageClass}>
+                      <p>{message.content}</p>
+                    </div>
+                  );
+                })}
+            </div>
+            <form onSubmit={handleFormSubmit}>
+              <input type="text" value={message} onChange={handleInputChange} />
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        )}
+      </div>
       {showSettingsPopup && (
         <div className="popup">
           <form onSubmit={handleSettingsSubmit}>

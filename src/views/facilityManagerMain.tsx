@@ -1,6 +1,12 @@
 import React, {useEffect, useState, useContext} from 'react';
 import {doGraphQLFetch} from '../graphql/fetch';
-import {keysOut, updateUser, userById} from '../graphql/queries';
+import {
+  keysOut,
+  updateUser,
+  userById,
+  userFromToken,
+  usersByOrganization,
+} from '../graphql/queries';
 import {AuthContext} from '../AuthContext';
 import Cookies from 'js-cookie';
 import {Key} from '../interfaces/Key';
@@ -8,6 +14,9 @@ import {User} from '../interfaces/User';
 import '../styles/facilityManagerMain.css';
 import {Link} from 'react-router-dom';
 import {useNavigate} from 'react-router-dom';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faComments} from '@fortawesome/free-solid-svg-icons';
+import {Message} from '../interfaces/Message';
 
 const apiURL = import.meta.env.VITE_API_URL;
 
@@ -16,11 +25,89 @@ const FacilityManagerMain: React.FC = () => {
   const {token} = useContext(AuthContext);
   const [user, setUser] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedChatUser, setSelectedChatUser] = useState<string>('');
   const [selectedKey, setSelectedKey] = useState<Key | null>(null);
   const [showSettingsPopup, setShowSettingsPopup] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [userId, setUserId] = useState<User | null>(null);
+  const [showMessages, setShowMessages] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
+  const websocketUrl = import.meta.env.VITE_WS_URL2;
   const navigate = useNavigate();
+  const cookieToken = Cookies.get('token');
+  useEffect(() => {
+    if (userId?.id) {
+      const wsServer = new WebSocket(websocketUrl + '?userId=' + userId.id);
+      setWs(wsServer);
+      wsServer.onopen = () => {
+        console.log('WebSocket connection opened');
+      };
+      wsServer.onmessage = (event) => {
+        if (event.data) {
+          const message = JSON.parse(event.data);
+          console.log('Message received:', message.message);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            {
+              sender: userId.id ?? '',
+              recipient: message.recipient,
+              content: message.content,
+            },
+          ]);
+          console.log('Messages:', messages);
+        }
+      };
+      wsServer.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      wsServer.onclose = () => {
+        console.log('WebSocket connection closed');
+      };
+    }
+  }, [userId?.id]);
+  const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedChatUser(event.target.value);
+  };
+
+  const handleOpenMessages = () => {
+    if (showMessages === false) {
+      getUsers();
+      setShowMessages(true);
+    } else {
+      setShowMessages(false);
+    }
+  };
+
+  const handleFormSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    handleSendMessage();
+  };
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(event.target.value);
+  };
+  const handleSendMessage = () => {
+    if (ws) {
+      ws.send(
+        JSON.stringify({
+          content: message,
+          recipient: selectedChatUser,
+          sender: userId?.id, // Add null check for userId
+        }),
+      );
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          sender: userId?.id || '',
+          recipient: selectedChatUser,
+          content: message,
+        },
+      ]);
+    }
+  };
   const logout = () => {
     // Clear the token or any other cleanup you need to do on logout
 
@@ -45,6 +132,18 @@ const FacilityManagerMain: React.FC = () => {
     console.log('res', response);
     setShowSettingsPopup(false);
   };
+
+  const getUsers = async () => {
+    const response = await doGraphQLFetch(
+      apiURL,
+      usersByOrganization,
+      {organization: userId?.organization || ''},
+      cookieToken,
+    );
+    setUsers(response.usersByOrganization);
+    console.log('res', response);
+  };
+
   useEffect(() => {
     const fetchKeys = async () => {
       try {
@@ -53,7 +152,13 @@ const FacilityManagerMain: React.FC = () => {
         });
         console.log(data);
         setKeys(data.keysOut || []);
-
+        const userResponse = await doGraphQLFetch(
+          apiURL,
+          userFromToken,
+          {},
+          cookieToken,
+        );
+        setUserId(userResponse.userFromToken);
         // Fetch users for each key
         const users = await Promise.all(
           data.keysOut.map(async (key: Key) => {
@@ -114,6 +219,50 @@ const FacilityManagerMain: React.FC = () => {
       >
         Logout
       </button>
+      <div>
+        <button className="open-messages-button" onClick={handleOpenMessages}>
+          <FontAwesomeIcon icon={faComments} />
+        </button>
+
+        {showMessages && (
+          <div className="message-container">
+            <div className="messages">
+              <select onChange={handleUserChange}>
+                {users.map((user, index) => (
+                  <option key={index} value={user.id}>
+                    {user.user_name}
+                  </option>
+                ))}
+              </select>
+
+              {messages
+                .filter(
+                  (message) =>
+                    message.sender === userId?.id ||
+                    message.recipient === selectedUser,
+                )
+                .map((message, index) => {
+                  let messageClass = '';
+                  if (message.recipient === userId?.id) {
+                    messageClass = 'message other';
+                  } else if (message.sender === userId?.id) {
+                    messageClass = 'message';
+                  }
+
+                  return (
+                    <div key={index} className={messageClass}>
+                      <p>{message.content}</p>
+                    </div>
+                  );
+                })}
+            </div>
+            <form onSubmit={handleFormSubmit}>
+              <input type="text" value={message} onChange={handleInputChange} />
+              <button type="submit">Send</button>
+            </form>
+          </div>
+        )}
+      </div>
       {showSettingsPopup && (
         <div className="popup">
           <form onSubmit={handleSettingsSubmit}>
