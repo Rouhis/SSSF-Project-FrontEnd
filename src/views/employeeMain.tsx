@@ -40,7 +40,7 @@ const EmployeeMain: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const navigate = useNavigate();
   const token = Cookies.get('token') || '';
-  const websocketUrl = import.meta.env.VITE_WS_URL2;
+  const websocketUrl = import.meta.env.VITE_WS_URL;
 
   useEffect(() => {
     if (userId) {

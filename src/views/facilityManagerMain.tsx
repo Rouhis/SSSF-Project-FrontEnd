@@ -36,7 +36,7 @@ const FacilityManagerMain: React.FC = () => {
   const [userId, setUserId] = useState<User | null>(null);
   const [showMessages, setShowMessages] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
-  const websocketUrl = import.meta.env.VITE_WS_URL2;
+  const websocketUrl = import.meta.env.VITE_WS_URL;
   const navigate = useNavigate();
   const cookieToken = Cookies.get('token');
   useEffect(() => {
