@@ -273,6 +273,12 @@ const orgById = `query Query($organizationByIdId: ID!) {
 }
 `;
 
+const deleteOrganization = `mutation Mutation($deleteOrganizationId: ID!) {
+  deleteOrganization(id: $deleteOrganizationId) {
+    message
+  }
+}`;
+
 export {
   login,
   register,
@@ -296,4 +302,5 @@ export {
   addFM,
   addOrganization,
   orgById,
+  deleteOrganization,
 };

@@ -4,6 +4,7 @@ import {doGraphQLFetch} from '../graphql/fetch';
 import {
   addFM,
   addOrganization,
+  deleteOrganization,
   getAllOrgs,
   updateUser,
 } from '../graphql/queries';
@@ -36,6 +37,7 @@ const AdminView: React.FC = () => {
   const [showSettingsPopup, setShowSettingsPopup] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [showDeleteOrg, setShowDeleteOrg] = useState(false);
   const token = Cookies.get('token');
   const navigate = useNavigate();
 
@@ -65,6 +67,27 @@ const AdminView: React.FC = () => {
 
     // Hide the settings popup
     setShowSettingsPopup(false);
+  };
+  /**
+   * Asynchronously deletes an organization.
+   *
+   * @param {string} orgId - The id of the organization to delete.
+   */
+  const deleteOrg = async () => {
+    const response = await doGraphQLFetch(
+      apiURL,
+      deleteOrganization,
+      {
+        deleteOrganizationId: currentOrg?.id,
+      },
+      token,
+    );
+    console.log(response);
+    if (response.deleteOrganization) {
+      alert('Organization deleted');
+    } else {
+      alert('Failed to delete organization');
+    }
   };
 
   // Function to log out the user
@@ -212,6 +235,14 @@ const AdminView: React.FC = () => {
               >
                 Add Facility Manager
               </button>
+              <button
+                onClick={() => {
+                  setCurrentOrg(org);
+                  setShowDeleteOrg(true);
+                }}
+              >
+                Delete Org
+              </button>
             </div>
           ))}
           {showAddFacilityManagerForOrgPopup && currentOrg && (
@@ -241,6 +272,17 @@ const AdminView: React.FC = () => {
                 onClick={() => setShowAddFacilityManagerForOrgPopup(false)}
               >
                 Close
+              </button>
+            </div>
+          )}
+          {showDeleteOrg && currentOrg && (
+            <div className="popup">
+              <h4>
+                Are you sure you want to delete {currentOrg.organization_name}?
+              </h4>
+              <button onClick={() => deleteOrg()}>Yes, delete it</button>
+              <button onClick={() => setShowDeleteOrg(false)}>
+                No, keep it
               </button>
             </div>
           )}
