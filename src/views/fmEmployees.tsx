@@ -60,7 +60,7 @@ const EmployeesView: React.FC = () => {
       },
       Cookies.get('token'),
     );
-    if (response.addEmployee) {
+    if (response.registerEmployee.user) {
       // Add the new key to the keys array
       setAddedUserPassword(response.registerEmployee.password);
       alert('Employee added');
