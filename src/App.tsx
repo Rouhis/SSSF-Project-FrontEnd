@@ -12,23 +12,40 @@ import Cookies from 'js-cookie';
 import EmployeeMain from './views/employeeMain';
 import AdminView from './views/admin';
 
+/**
+ * App component.
+ *
+ * @component
+ * @returns {JSX.Element} App component.
+ */
 const App: React.FC = () => {
   const apiURL = import.meta.env.VITE_API_URL;
-  const [userRoles, setUserRoles] = useState<string[]>([]); // Array to store user roles
+  const [userRoles, setUserRoles] = useState<string[]>([]);
 
+  /**
+   * Asynchronously fetches the user token.
+   */
   const fetchUserToken = async () => {
     const token = Cookies.get('token');
     if (token) {
       const data = await doGraphQLFetch(apiURL, checkToken, {}, token);
-      setUserRoles(data.checkToken.user.role.split(',')); // Assuming roles are comma-separated (adjust if needed)
+      setUserRoles(data.checkToken.user.role.split(','));
     }
   };
 
+  /**
+   * useEffect hook to fetch the user token when the component mounts.
+   */
   useEffect(() => {
     fetchUserToken();
   }, []);
 
-  // Helper function to check if user has a specific role
+  /**
+   * Checks if the user has a specific role.
+   *
+   * @param {string} requiredRole - The required role.
+   * @returns {boolean} Whether the user has the required role.
+   */
   const hasRole = (requiredRole: string): boolean => {
     return userRoles.includes(requiredRole);
   };
@@ -36,7 +53,6 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Login and Register routes (unchanged) */}
         <Route path="/login" element={<LoginView />} />
         <Route path="/register" element={<RegisterForm />} />
 
